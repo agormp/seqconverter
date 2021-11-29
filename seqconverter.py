@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-# By Anders Gorm Pedersen, agpe@dtu.dk, Bioinformatics, Technical University of Denmark, 2019
+# Anders Gorm Pedersen, agpe@dtu.dk,
+# Section for Bioinformatics, DTU Health Technology, Technical University of Denmark
+
 # Converts between different sequence file formats. Performs various manipulations on sequences
 
-import sys, os.path, seqlib
+import sys
+import os.path
+import sequencelib as seqlib
 #import statistics as st NOTE: only works on 3.4 and upwards. Wait for CBS compatibility...
 from optparse import OptionParser
 
@@ -72,14 +76,14 @@ def build_parser():
                           help="Remove conserved columns from alignment")
 
     parser.add_option("--paste", action="store_true", dest="paste",
-                          help="Concatenate identically named sequences from separate input files. " + 
+                          help="Concatenate identically named sequences from separate input files. " +
                           "Sequences are pasted end to end in the same order as the input files. " +
                           "All input files must contain same number of sequences, and sequences " +
                           "in different files must have same name." +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
     parser.add_option("--overlap", action="store_true", dest="overlap",
-                          help="Similar to --paste, but for input alignments that overlap partly. " + 
+                          help="Similar to --paste, but for input alignments that overlap partly. " +
                           "Overlap is discovered automatically and partition boundaries are then set " +
                           "such that each partition is covered by a unique set of genes. " +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
@@ -102,7 +106,7 @@ def build_parser():
     parser.add_option("--bestblock", action="store_true", dest="bestblock",
                           help="Appends MrBayes block with commands for running BEST analysis to output file (forces output in Nexus format). " +
                             "Charsets and partitions are generated automatically so they correspond to input files " +
-                            "(one partition for each file).")                        
+                            "(one partition for each file).")
 
     parser.add_option("--filterdupseq", action="store_true", dest="dupseqfilter",
                           help="Remove duplicate sequences (keeping one of each); print names of removed sequences on stderr.")
@@ -149,9 +153,9 @@ def build_parser():
     parser.add_option("--debug", action="store_true", dest="debug",
                       help="Print longer error messages")
 
-    parser.set_defaults(informat="auto", outformat="fasta", nocomments=False, degap=False, remcols=None, remambigcols=False, remgapcols=False, remallgapcols=False, 
-                        frac=None, remconscols=False, paste=False, overlap=False, minoverlap=-1, 
-                        charset=False, multifile=False, mbpartblock=False, bestblock=False, gff=None, gffsymbol=None, 
+    parser.set_defaults(informat="auto", outformat="fasta", nocomments=False, degap=False, remcols=None, remambigcols=False, remgapcols=False, remallgapcols=False,
+                        frac=None, remconscols=False, paste=False, overlap=False, minoverlap=-1,
+                        charset=False, multifile=False, mbpartblock=False, bestblock=False, gff=None, gffsymbol=None,
                         dupnamefilter=False, fixdupnames=False, dupseqfilter=False, subseq=None, wsize=None, samplesize=0, savenamefile=None, subseqrename=False,
                         gbname=None, appendnumber=False, rename=None, renamenumber=None, renameregexp=False, namefile=None, remfile=None, filterpos=None,
                         restorenames=None, revcomp=False, translate=False, summary=False, summarynames=False, debug=False)
@@ -173,8 +177,8 @@ def check_commandline(options, args):
         alignin = True
     if (options.outformat == "nexus" or options.outformat == "nexusgap" or options.outformat == "phylip" or options.outformat == "clustal"):
         alignout = True
-    if (alignin or alignout or options.remcols or options.remambigcols or options.remgapcols or options.remallgapcols or 
-                            options.remconscols or options.subseq or options.paste or options.bestblock or 
+    if (alignin or alignout or options.remcols or options.remambigcols or options.remgapcols or options.remallgapcols or
+                            options.remconscols or options.subseq or options.paste or options.bestblock or
                             options.overlap):
         options.aligned = True
     if options.frac is not None:        # Note: value may be zero, and bool(0) = False!
@@ -183,7 +187,7 @@ def check_commandline(options, args):
     # If option --gbname is set: force input format to "genbank"
     if options.gbname:
         options.informat = "genbank"
-        
+
     # If options.frac is set: convert from string to float
     if options.frac is not None:
         options.frac = float(options.frac)
@@ -202,7 +206,7 @@ def check_commandline(options, args):
     # Sanity check #2: option --degap cannot be used if output is an alignment
     if options.degap and alignout:
         raise seqlib.SeqError("Removal of all gap characters (--degap) cannot be performed on aligned sequences")
-    
+
     # Sanity check #3: option --subseq cannot be used together with options --remambigcols, --remgapcols, --remallgapcols or --remconscols
     if options.subseq and options.remambigcols:
         raise seqlib.SeqError("Options --subseq and --remambigcols cannot be used simultaneously")
@@ -216,7 +220,7 @@ def check_commandline(options, args):
     # Sanity check #4: option --subseqrename can only be used in combination with --subseq
     if options.subseqrename and not options.subseq:
         raise seqlib.SeqError("Option --subseqrename (add '_START_STOP' to seqnames) requires option --subseq")
-    
+
     # Sanity check #5: option --savenames requires option --renamenumber or --renameregexp
     if options.savenamefile and not (options.renamenumber or options.renameregexp):
         raise seqlib.SeqError("Option --savenames requires option --renamenumber or --renameregexp")
@@ -224,15 +228,15 @@ def check_commandline(options, args):
     # Sanity check #6: options --renamenumber and --restorenames are incompatible
     if options.renamenumber and  options.restorenames:
         raise seqlib.SeqError("Option --renamenumber and --restorenames cannot be used simultaneously")
-        
+
     # Sanity check #7: options --renameregexp and --restorenames are incompatible
     if options.renameregexp and  options.restorenames:
         raise seqlib.SeqError("Option --renameregexp and --restorenames cannot be used simultaneously")
-        
+
     # Sanity check #8: options --renameregexp and --paste are incompatible
     if options.renameregexp and  options.paste:
         raise seqlib.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
-        
+
     # Sanity check #9: option --bestblock is not meaningful unless several input files are provided
     if options.bestblock and len(args) == 1:
         raise seqlib.SeqError("Option --bestblock requires multiple input files (one for each partition)")
@@ -267,16 +271,16 @@ def read_seqs(options, args):
             seqfile = seqlib.Genbankfilehandle(filename, namefromfeatures=options.gbname)
         else:
             seqfile = seqlib.Seqfile(filename, options.informat)
-            
+
         # If filetype was autodetected: check if this should be read as an alignment:
         if options.informat == "autodetect" and isinstance(seqfile, seqlib.Alignfile_reader):
             options.aligned = True
-        
+
         if options.aligned:
             seqlist.append(seqfile.read_alignment(options.dupnamefilter))
         else:
             seqlist.append(seqfile.read_seqs(options.dupnamefilter))
-    
+
     # Post processing to check if this is alignment, despite other flags not indicating it
     # This can happen if alignment is in e.g. fasta format, and none of the alignment status-triggering flags are used
     # Assume sequences are aligned if all sequences have same length:
@@ -287,7 +291,7 @@ def read_seqs(options, args):
             for seq in seqset:
                 if len(seq) != baselength:
                     change_to_alignment = False
-                    
+
         if change_to_alignment:
             newseqlist = []
             for seqset in seqlist:
@@ -296,21 +300,21 @@ def read_seqs(options, args):
                 newseqlist.append(newseqset)
             seqlist = newseqlist
             options.aligned = True
-    
-    # If automatic overlap detection has been requested: find overlaps and concatenate or merge sub-alignments 
+
+    # If automatic overlap detection has been requested: find overlaps and concatenate or merge sub-alignments
     if options.overlap:
-        
+
         # Create consensus sequence from each seq in seqset
         consensus_list = []
         alignment_dict = {}
         for alignment in seqlist:
             consensus_list.append( alignment.consensus() )
             alignment_dict[alignment.name] = alignment
-        
+
         # Find overlap between consensus sequences, get list of contigs
         ra = seqlib.Read_assembler( consensus_list )
         contiglist = ra.assemble(minoverlap=options.minoverlap)
-        
+
         # Build concatenated alignment from non-overlapping sub-alignments
         # Order and coordinates for each subalignment is based on info about regions in each contig from contiglist
         seqs = None
@@ -326,7 +330,7 @@ def read_seqs(options, args):
                     seqs.addseqset(subalignment)
                 else:
                     seqs.appendalignment(subalignment)
-    
+
     # For other options than overlap: Collect sequences in one sequence collection object
     else:
         seqs = seqlist[0]
@@ -342,19 +346,19 @@ def read_seqs(options, args):
 
 def filterdupseqs(seqs):
     simlist = seqs.removedupseqs()
-    if simlist: 
+    if simlist:
         sys.stderr.write("Lists of identical sequences:\n")
         for namelist in simlist:
             sys.stderr.write(" ".join(namelist))
             sys.stderr.write("\n")
-            
+
     return(seqs)
 
 ################################################################################################
 
 def positionfilter(seqs, options):
-    
-    # Extract positions and residues from input of the form: 484K,501Y,987W. 
+
+    # Extract positions and residues from input of the form: 484K,501Y,987W.
     # Save as list of (pos, residue) tuples
     varlist = []
     items = options.filterpos.split(",")
@@ -362,7 +366,7 @@ def positionfilter(seqs, options):
         residue = item[-1]
         pos = int(item[:-1]) - 1     # Convert to python array numbering from natural numbering
         varlist.append( (pos, residue) )
-    
+
     # Iterate over sequences, and select those that contain all requested variants
     selseqs = seqs.__class__()       # Create new object of same class as seqs (don't know which subclass they are)
     for seq in seqs:
@@ -372,7 +376,7 @@ def positionfilter(seqs, options):
                 select = False
         if select:
             selseqs.addseq(seq)
-        
+
     return selseqs
 
 ################################################################################################
@@ -410,7 +414,7 @@ def change_seqs(seqs, options):
                 newseqs.addseq(seq)
             seqs = newseqs
         seqs.remgaps()
-        
+
     # Removal of listed columns
     if options.remcols:
         remlist = []
@@ -452,7 +456,7 @@ def change_seqs(seqs, options):
         start = int(start)
         stop = int(stop)
         seqs = seqs.subseq(start, stop, slicesyntax=False, rename=options.subseqrename)
-        
+
     # Extraction of sequence windows
     if options.wsize:
         newseqs = seqlib.Seq_set()
@@ -472,27 +476,27 @@ def change_seqs(seqs, options):
     # Note: option appendnumber is not under "else" clause: In principle it can be combined with previous renaming!
     if options.appendnumber:
         seqs.appendnumber(options.savenamefile)
-        
+
     # Restore names
     if options.restorenames:
         seqs.transname(options.restorenames)
-     
-     
+
+
     # Translation
     if options.translate:
         seqs = seqs.translate()
-       
+
     # Reverse complement
     if options.revcomp:
         seqs = seqs.revcomp()
 
     # Return altered sequences
     return seqs
-        
+
 ################################################################################################
 
 def print_summary(seqs, options):
-    
+
     # Print number of seqs
     print("Number of sequences: {:10d}".format(len(seqs)))
 
@@ -509,11 +513,11 @@ def print_summary(seqs, options):
         print("Maximum length:   {:13d}".format(max(seqlenlist)))
         print("Average length:   {:13.2f}\n\n".format(lensum/len(seqs)))
 
-    # Alignments: 
+    # Alignments:
     else:
         # Print alignment length
         print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
-        
+
         # Print distance summary: nucleotide diversity (= average pairwise distance) + its standard error
         dm = seqs.distmatrix(dist="pdist_ignoregaps")
         dist_summary = dm.distsummary()
@@ -537,15 +541,15 @@ def print_summary(seqs, options):
         print("    No. variable sites:  {:5d}".format(numvar))
         print("    No. gappy sites:     {:5d}".format(numgap))
         print("    No. ambiguous sites: {:5d}\n".format(numambig))
-    
+
     # Print composition #########################################################################################
     compositiondict = seqs.composition()
-    
+
     # If any ambiguity symbols have zero counts: remove from output
     remset = set()
     for symbol in seqs.ambigsymbols:
         if compositiondict[symbol][0] == 0:
-            remset.add(symbol)    
+            remset.add(symbol)
     symbols = compositiondict.keys() - remset
     symbols = sorted(list(symbols))
 
@@ -560,7 +564,7 @@ def print_summary(seqs, options):
 ################################################################################################
 
 def print_seqs(seqs, options, filehandle=sys.stdout):
-    
+
     # NOTE: default is to write to stdout (print to terminal) but other filehandle can be set
 
     # Some options implies Nexus format output
@@ -634,10 +638,10 @@ def use_gff_file(seqs, options):
         if annotsymbol not in seq.annotsymbols:
             seq.comments += "'{}'={}; ".format(annotsymbol, annot)
             seq.annotsymbols.add(annotsymbol)
-        
+
     # Postprocess sequence set: construct seq.annotation strings from seq.annotlist lists
     for seq in seqs:
-        seq.annotation = "".join(seq.annotlist)        
+        seq.annotation = "".join(seq.annotlist)
 
 ################################################################################################
 
@@ -647,18 +651,18 @@ def main():
     try:
         (options, args) = check_commandline(options, args)
         seqs = read_seqs(options, args)
-        
+
         if options.gff:
             use_gff_file(seqs, options)
-        
+
         if options.dupseqfilter:
             seqs = filterdupseqs(seqs)
-        
+
         if options.filterpos:
             seqs = positionfilter(seqs, options)
-            
+
         seqs = change_seqs(seqs, options)
-        
+
         if options.multifile:
             # Output to multiple files: one partition per file, in nexus format
             write_partitions(seqs, options)
@@ -671,7 +675,7 @@ def main():
                     print(name)
             else:
                 print_seqs(seqs, options)
-            
+
             if options.bestblock:
                 print("")
                 print(seqs.bestblock())
@@ -683,8 +687,8 @@ def main():
             if options.mbpartblock:
                 print("")
                 print(seqs.mbpartblock())
-            
-            
+
+
     except seqlib.SeqError as exc:
         if options.debug:
             import traceback
