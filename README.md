@@ -16,6 +16,7 @@ python3 -m pip install seqconverter
 
 ## Highlights
 
+* Can be used to convert between sequence file formats but also does other things
 * Read and write **aligned** sequences in the following formats:
 	* fasta
 	* Nexus
@@ -29,7 +30,7 @@ python3 -m pip install seqconverter
 	* raw
 	* Genbank
 	* How
-* Writes output to stdout, so can be used in pipes or redirected to file
+* Writes to stdout, so output can be used in pipes or redirected to file
 * Extract subsequence (specified columns) from alignment
 * Extract all overlapping windows of specified size
 * Extract named sequences from set of sequences
