@@ -77,11 +77,11 @@ def build_parser():
 
     parser.add_argument("filelist", nargs="+", metavar='SEQFILE', help="One or more sequence files")
 
-    parser.add_argument("-I", action='store', dest="informat", metavar="FORMAT",
+    parser.add_argument("-I", action='store', dest="informat", metavar="FORMAT", default="auto",
                       choices=["auto", "nexus", "phylip", "fasta", "clustal", "raw", "tab", "genbank", "how"],
                       help="Input format: auto, fasta, tab, raw, genbank, how, clustal, phylip, nexus [default: auto]")
 
-    parser.add_argument("-O", action='store', dest="outformat", metavar="FORMAT",
+    parser.add_argument("-O", action='store', dest="outformat", metavar="FORMAT", default="fasta",
                       choices=["nexus", "phylip", "fasta", "clustal", "raw", "tab", "nexusgap", "how"],
                       help="Output format: fasta, tab, raw, how, clustal, phylip, nexus, nexusgap, nexusmulti [default: fasta]")
 
@@ -150,7 +150,7 @@ def build_parser():
                           "such that each partition is covered by a unique set of genes. " +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
-    parser.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N",
+    parser.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1
                         help="Minimum overlap required for merging input alignments (default: set automatically based on seq lengths)")
 
     parser.add_argument("--multifile", action="store_true", dest="multifile",
@@ -201,7 +201,7 @@ def build_parser():
                           help="Restore original names using info previously saved in FILE")
 
     parser.add_argument("--revcomp", action="store_true", dest="revcomp",
-                      help="Return reverse complement of sequence(s).")
+                      help="Return reverse complement of sequence(s). Requires sequences to be DNA.")
 
     parser.add_argument("--translate", action="store_true", dest="translate",
                       help="Translate DNA into amino acid sequences (requires sequences to be DNA, in frame, and length multiple of 3)")
@@ -214,14 +214,6 @@ def build_parser():
 
     parser.add_argument("--debug", action="store_true", dest="debug",
                       help="Print longer error messages")
-
-    parser.set_defaults(informat="auto", outformat="fasta", nocomments=False, degap=False, remcols=None, remambigcols=False, remgapcols=False, remallgapcols=False,
-                        frac=None, remconscols=False, paste=False, overlap=False, minoverlap=-1,
-                        charset=False, multifile=False, mbpartblock=False, bestblock=False, gff=None, gffsymbol=None,
-                        dupnamefilter=False, fixdupnames=False, dupseqfilter=False, subseq=None, wsize=None, samplesize=0, savenamefile=None, subseqrename=False,
-                        gbname=None, appendnumber=False, rename=None, renamenumber=None, renameregexp=False, namefile=None, remfile=None, filterpos=None,
-                        restorenames=None, revcomp=False, translate=False, summary=False, summarynames=False, debug=False)
-
     return parser
 
 ################################################################################################
@@ -249,10 +241,6 @@ def check_commandline(args):
     # If option --gbname is set: force input format to "genbank"
     if args.gbname:
         args.informat = "genbank"
-
-    # If args.frac is set: convert from string to float
-    if args.frac is not None:
-        args.frac = float(args.frac)
 
     # Perform sanity checks on combination of args
     # (Note: if autodetection of filetype is requested, then many checks are impossible - defer error checking to seqlib)
@@ -300,11 +288,11 @@ def check_commandline(args):
         raise seqlib.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
 
     # Sanity check #9: option --bestblock is not meaningful unless several input files are provided
-    if args.bestblock and len(args) == 1:
+    if args.bestblock and len(args.filelist) == 1:
         raise seqlib.SeqError("Option --bestblock requires multiple input files (one for each partition)")
 
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
-    if args.overlap and len(args) == 1:
+    if args.overlap and len(args.filelist) == 1:
         raise seqlib.SeqError("Option --overlap requires multiple input files")
 
     # Sanity check #10: option --gffsymbol requires option --gff
