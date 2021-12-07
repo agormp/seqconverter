@@ -192,7 +192,6 @@ optional arguments:
                         etc.). No sequences are output.
   --names               Print names of sequences in data set.
   --debug               Print longer error messages
-Command me, Master>
 ```
 
 
