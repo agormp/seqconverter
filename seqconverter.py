@@ -150,7 +150,7 @@ def build_parser():
                           "such that each partition is covered by a unique set of genes. " +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
-    parser.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1
+    parser.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1,
                         help="Minimum overlap required for merging input alignments (default: set automatically based on seq lengths)")
 
     parser.add_argument("--multifile", action="store_true", dest="multifile",
@@ -564,11 +564,10 @@ def print_summary(seqs, args):
         print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
 
         # Print distance summary: nucleotide diversity (= average pairwise distance) + its standard error
-        dm = seqs.distmatrix(dist="pdist_ignoregaps")
-        dist_summary = dm.distsummary()
+        avg, sem = seqs.sequence_diversity()
         print("Nucleotide diversity pi (average pairwise sequence distance)")
-        print("    Mean:               {:.5f}".format(dist_summary[0]))
-        print("    Standard error:     {:.5f}\n".format(dist_summary[1]))
+        print("    Mean:               {:.5f}".format(avg))
+        print("    Standard error:     {:.5f}\n".format(sem))
 
         # Print number of variable sites, number of gapcontaining sites, and number of ambiguity containing sites
         numvar = 0
@@ -582,7 +581,7 @@ def print_summary(seqs, args):
                 numgap += 1
             if (seqs.ambigsymbols & columnset):
                 numambig += 1
-        print("Site summary (note: variable, gappy, and ambiguous sites may overlap")
+        print("Site summary (note: variable, gappy, and ambiguous sites may overlap)")
         print("    No. variable sites:  {:5d}".format(numvar))
         print("    No. gappy sites:     {:5d}".format(numgap))
         print("    No. ambiguous sites: {:5d}\n".format(numambig))
