@@ -1,6 +1,6 @@
 # seqconverter: command line program for reading, writing, and manipulating sequence files
 
-![](https://img.shields.io/badge/version-2.1.0-blue)
+![](https://img.shields.io/badge/version-2.1.1-blue)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
 
