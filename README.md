@@ -14,6 +14,10 @@ The seqconverter source code is available on GitHub: https://github.com/agormp/s
 python3 -m pip install seqconverter
 ```
 
+## Dependencies
+
+seqconverter relies on the [sequencelib](https://github.com/agormp/sequencelib) library, which is automatically included when using pip to install.
+
 ## Highlights
 
 * Can be used to convert between sequence file formats but also does other things
