@@ -16,7 +16,7 @@ python3 -m pip install seqconverter
 
 ## Dependencies
 
-seqconverter relies on the [sequencelib](https://github.com/agormp/sequencelib) library, which is automatically included when using pip to install.
+seqconverter relies on the [sequencelib library](https://github.com/agormp/sequencelib) and the [NumPy package](https://numpy.org), which are automatically included when using pip to install.
 
 ## Highlights
 
