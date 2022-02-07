@@ -26,9 +26,6 @@ def main():
         args = check_commandline(args)
         seqs = read_seqs(args)
 
-        if args.gff:
-            use_gff_file(seqs, args)
-
         if args.dupseqfilter:
             seqs = filterdupseqs(seqs)
 
@@ -49,10 +46,6 @@ def main():
                     print(name)
             else:
                 print_seqs(seqs, args)
-
-            if args.bestblock:
-                print("")
-                print(seqs.bestblock())
 
             if args.charset:
                 print("")
@@ -77,143 +70,166 @@ def build_parser():
 
     parser.add_argument("filelist", nargs="+", metavar='SEQFILE', help="One or more sequence files")
 
-    parser.add_argument("-I", action='store', dest="informat", metavar="FORMAT", default="auto",
-                      choices=["auto", "nexus", "phylip", "fasta", "clustal", "raw", "tab", "genbank", "how"],
-                      help="Input format: auto, fasta, tab, raw, genbank, how, clustal, phylip, nexus [default: auto]")
+    #########################################################################################
 
-    parser.add_argument("-O", action='store', dest="outformat", metavar="FORMAT", default="fasta",
-                      choices=["nexus", "phylip", "fasta", "clustal", "raw", "tab", "nexusgap", "how"],
-                      help="Output format: fasta, tab, raw, how, clustal, phylip, nexus, nexusgap, nexusmulti [default: fasta]")
+    formatg = parser.add_argument_group("File formats")
 
-    parser.add_argument("--nocomments", action="store_true", dest="nocomments",
-                        help="Do not print comments in output (only print seqnames)")
+    formatg.add_argument("-I", action='store', dest="informat", metavar="FORMAT", default="auto",
+                      choices=["auto", "fasta", "nexus", "phylip", "clustal", "genbank", "tab", "raw", "how"],
+                      help="Input format: %(choices)s [default: %(default)s]")
 
-    parser.add_argument("--subseq", action="store", dest="subseq", metavar="START,STOP",
-                          help="Extract subsequence, positions START to STOP, from alignment")
+    formatg.add_argument("-O", action='store', dest="outformat", metavar="FORMAT", default="fasta",
+                      choices=["fasta", "nexus", "nexusgap", "phylip", "clustal", "tab", "raw", "how"],
+                      help="Output format:  %(choices)s [default: %(default)s]")
 
-    parser.add_argument("--subseqrename", action="store_true", dest="subseqrename",
-                          help="When extracting sub-sequences: add '_START_STOP' to seqnames")
+    formatg.add_argument("--nocomments", action="store_true", dest="nocomments",
+                        help="Do not include comments in output (only print seqnames)")
 
-    parser.add_argument("--windows", action="store", type=int, dest="wsize", metavar="WSIZE",
-                          help="Extract all overlapping sequence windows of size WSIZE")
+    #########################################################################################
 
-    parser.add_argument("--subsample", action="store", type=int, dest="samplesize", metavar="N",
+    renameg = parser.add_argument_group("Renaming sequences")
+
+    renameg.add_argument("--rename", action="store", dest="rename", metavar="OLD,NEW",
+                          help="Rename single sequence from OLD to NEW")
+
+    renameg.add_argument("--renamenumber", action="store", dest="renamenumber", metavar="BASENAME",
+                          help="Rename all sequences to this form: BASENAME_001, ...")
+
+    renameg.add_argument("--appendnumber", action="store_true", dest="appendnumber",
+                          help="Append numbering at end of existing sequence names (SeqA_001, SeqXYZ_002, ...")
+
+    renameg.add_argument("--renameregexp", action="store", dest="renameregexp", metavar='"REGEXP"',
+                          help="Rename sequences by deleting parts of names matching regular expression in REGEXP")
+
+    renameg.add_argument("--regdupfix", action="store_true", dest="fixdupnames",
+                        help="Fix duplicate names, created by regexp, by appending numbers to duplicates (seqA, seqA_2, ...)")
+
+    renameg.add_argument("--savenames", action="store", dest="savenamefile", metavar="FILE",
+                          help="Save renaming information in FILE for later use")
+
+    renameg.add_argument("--restorenames", action="store", dest="restorenames", metavar="FILE",
+                          help="Restore original names using info previously saved in FILE")
+
+    renameg.add_argument("--gbname", action="store", dest="gbname", metavar="FIELD1[,FIELD2,FIELD3,...]",
+                        help="For Genbank input: construct sequence names from the list of named fields, in the specified order")
+
+    #########################################################################################
+
+    subsetg = parser.add_argument_group("Retrieve subset of sequences")
+
+    subsetg.add_argument("--subsample", action="store", type=int, dest="samplesize", metavar="N",
                         help="Randomly extract N sequences from sequence set")
 
-    parser.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
-                        help="Extract sequences listed in NAMEFILE")
+    subsetg.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
+                        help="Retrieve sequences listed in NAMEFILE")
 
-    parser.add_argument("--remseqs", action="store", dest="remfile", metavar="NAMEFILE",
-                        help="Remove sequences listed in NAMEFILE")
+    subsetg.add_argument("--remseqs", action="store", dest="remfile", metavar="NAMEFILE",
+                        help="Discard sequences listed in NAMEFILE")
 
-    parser.add_argument("--filterpos", action="store", dest="filterpos", metavar="VARIANT[,VARIANT,...]",
-                          help="""Extract sequences containing specific residues on specific positions. Syntax is: <POS><RESIDUE>,
+    subsetg.add_argument("--filterpos", action="store", dest="filterpos", metavar="VARIANT[,VARIANT,...]",
+                          help="""Retrieve sequences containing specific residues on specific positions. Syntax is: <POS><RESIDUE>,
                           possibly in a comma-separated list. Example: 484K,501Y""")
 
-    parser.add_argument("--gff", action="store", dest="gff", metavar="FILE",
-                          help="Get annotation info for sequences from GFF-formatted FILE")
+    subsetg.add_argument("--filterdupseq", action="store_true", dest="dupseqfilter",
+                          help="Remove duplicate sequences (keeping one of each); print names of removed sequences on stderr.")
 
-    parser.add_argument("--gffsymbol", action="store", dest="gffsymbol", metavar="ANNOT",
-                          help="Use the character ANNOT in the sequence annotation strings derived from GFF file")
+    subsetg.add_argument("--filterdupname", action="store_true", dest="dupnamefilter",
+                          help="Remove sequences with duplicate names (keeping one of each). If this option is not set (default): stop execution on duplicate names.")
 
-    parser.add_argument("--degap", action="store_true", dest="degap",
+    #########################################################################################
+
+    seqpartg = parser.add_argument_group("Extracting or removing parts of sequences")
+
+    seqpartg.add_argument("--subseq", action="store", dest="subseq", metavar="START,STOP",
+                          help="Extract subsequence, positions START to STOP, from alignment")
+
+    seqpartg.add_argument("--subseqrename", action="store_true", dest="subseqrename",
+                          help="When extracting sub-sequences: add '_START_STOP' to seqnames")
+
+    seqpartg.add_argument("--windows", action="store", type=int, dest="wsize", metavar="WSIZE",
+                          help="Extract all overlapping sequence windows of size WSIZE")
+
+    seqpartg.add_argument("--degap", action="store_true", dest="degap",
                           help="Remove all gap characters from sequences")
 
-    parser.add_argument("--remcols", action="store", dest="remcols", metavar="INDEX LIST",
+    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEX LIST",
                           help="Remove listed columns from alignment. Columns can be indicated as comma-separated list of indices, and as ranges. Example: --remcols=10,15,22-40,57")
 
-    parser.add_argument("--remambigcols", action="store_true", dest="remambigcols",
+    seqpartg.add_argument("--remambigcols", action="store_true", dest="remambigcols",
                           help="Remove columns where one or more residues are ambiguity symbols (e.g., N for nucleotides)")
 
-    parser.add_argument("--remgapcols", action="store_true", dest="remgapcols",
+    seqpartg.add_argument("--remgapcols", action="store_true", dest="remgapcols",
                           help="Remove columns where one or more residues are gaps")
 
-    parser.add_argument("--remallgapcols", action="store_true", dest="remallgapcols",
+    seqpartg.add_argument("--remallgapcols", action="store_true", dest="remallgapcols",
                         help="Remove columns that are all-gaps")
 
-    parser.add_argument("--remfracgapcols", action="store", type=float, dest="frac", metavar="FRAC",
+    seqpartg.add_argument("--remfracgapcols", action="store", type=float, dest="frac", metavar="FRAC",
                         help="Remove columns that contain > FRAC fraction gaps")
 
-    parser.add_argument("--remconscols", action="store_true", dest="remconscols",
+    seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
                           help="Remove conserved columns from alignment")
 
-    parser.add_argument("--paste", action="store_true", dest="paste",
+    #########################################################################################
+
+    multifileg = parser.add_argument_group("Combining multiple sequence files")
+
+    multifileg.add_argument("--paste", action="store_true", dest="paste",
                           help="Concatenate identically named sequences from separate input files. " +
                           "Sequences are pasted end to end in the same order as the input files. " +
                           "All input files must contain same number of sequences, and sequences " +
                           "in different files must have same name." +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
-    parser.add_argument("--overlap", action="store_true", dest="overlap",
+    multifileg.add_argument("--overlap", action="store_true", dest="overlap",
                           help="Similar to --paste, but for input alignments that overlap partly. " +
                           "Overlap is discovered automatically and partition boundaries are then set " +
                           "such that each partition is covered by a unique set of genes. " +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
-    parser.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1,
+    multifileg.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1,
                         help="Minimum overlap required for merging input alignments (default: set automatically based on seq lengths)")
 
-    parser.add_argument("--multifile", action="store_true", dest="multifile",
+    multifileg.add_argument("--multifile", action="store_true", dest="multifile",
                         help="Outputs to multiple files (one per partition) instead of stdout. " +
                           "Partitions are generated automatically based on other options.")
 
-    parser.add_argument("--charset", action="store_true", dest="charset",
+    multifileg.add_argument("--charset", action="store_true", dest="charset",
                         help="Appends Nexus form charset block listing partitions in data (forces output in Nexus format). " +
                           "Charsets and partitions are generated automatically based on other options.")
 
-    parser.add_argument("--mbpartblock", action="store_true", dest="mbpartblock",
+    multifileg.add_argument("--mbpartblock", action="store_true", dest="mbpartblock",
                         help="Appends MrBayes block with commands for running partitioned analysis (forces output in Nexus format). " +
                           "Charsets and partitions are generated automatically based on other options.")
 
-    parser.add_argument("--bestblock", action="store_true", dest="bestblock",
-                          help="Appends MrBayes block with commands for running BEST analysis to output file (forces output in Nexus format). " +
-                            "Charsets and partitions are generated automatically so they correspond to input files " +
-                            "(one partition for each file).")
+    #########################################################################################
 
-    parser.add_argument("--filterdupseq", action="store_true", dest="dupseqfilter",
-                          help="Remove duplicate sequences (keeping one of each); print names of removed sequences on stderr.")
+    dnag = parser.add_argument_group("DNA manipulations")
 
-    parser.add_argument("--filterdupname", action="store_true", dest="dupnamefilter",
-                          help="Remove sequences with duplicate names (keeping one of each). If this option is not set (default): stop execution on duplicate names.")
-
-    parser.add_argument("--gbname", action="store", dest="gbname", metavar="FIELD1[,FIELD2,FIELD3,...]",
-                        help="For Genbank input: construct sequence names from the list of named fields, in the specified order")
-
-    parser.add_argument("--appendnumber", action="store_true", dest="appendnumber",
-                          help="Append numbering at end of existing sequence names (SeqA_001, SeqXYZ_002, ...")
-
-    parser.add_argument("--rename", action="store", dest="rename", metavar="OLD,NEW",
-                          help="Rename sequence from OLD to NEW")
-
-    parser.add_argument("--renamenumber", action="store", dest="renamenumber", metavar="BASENAME",
-                          help="Rename sequences to this form: BASENAME_001, ...")
-
-    parser.add_argument("--renameregexp", action="store", dest="renameregexp", metavar='"REGEXP"',
-                          help="Rename sequences by deleting parts of names matching regular expression in REGEXP")
-
-    parser.add_argument("--regdupfix", action="store_true", dest="fixdupnames",
-                        help="Fix duplicate names, created by regexp, by appending numbers to duplicates (seqA, seqA_2, ...)")
-
-    parser.add_argument("--savenames", action="store", dest="savenamefile", metavar="FILE",
-                          help="Save renaming information in FILE for later use")
-
-    parser.add_argument("--restorenames", action="store", dest="restorenames", metavar="FILE",
-                          help="Restore original names using info previously saved in FILE")
-
-    parser.add_argument("--revcomp", action="store_true", dest="revcomp",
+    dnag.add_argument("--revcomp", action="store_true", dest="revcomp",
                       help="Return reverse complement of sequence(s). Requires sequences to be DNA.")
 
-    parser.add_argument("--translate", action="store_true", dest="translate",
+    dnag.add_argument("--translate", action="store_true", dest="translate",
                       help="Translate DNA into amino acid sequences (requires sequences to be DNA, in frame, and length multiple of 3)")
 
-    parser.add_argument("--summary", action="store_true", dest="summary",
+    #########################################################################################
+
+    summaryg = parser.add_argument_group("Summaries")
+
+    summaryg.add_argument("--summary", action="store_true", dest="summary",
                       help="Print summary of data set (names, number, lengths, composition, etc.). No sequences are output.")
 
-    parser.add_argument("--names", action="store_true", dest="summarynames",
+    summaryg.add_argument("--names", action="store_true", dest="summarynames",
                       help="Print names of sequences in data set.")
+
+    #########################################################################################
+
+    debug = parser.add_argument_group("Debugging")
 
     parser.add_argument("--debug", action="store_true", dest="debug",
                       help="Print longer error messages")
+    #########################################################################################
+
     return parser
 
 ################################################################################################
@@ -224,7 +240,7 @@ def check_commandline(args):
         args.informat = "autodetect"         # Long name required by seqlib, short better for user interface...
 
     # Set flags indicating whether input and/or output is aligned, and whether file should be read as alignment
-    # Note: args that require manipulation of columns, and --paste and --bestblock also implies aligned sequences
+    # Note: args that require manipulation of columns, and --paste also implies aligned sequences
     # (reading as alignment results in check of equal sequence lengths)
     alignin = alignout = args.aligned = False
     if (args.informat == "nexus" or args.informat == "phylip" or args.informat == "clustal"):
@@ -232,7 +248,7 @@ def check_commandline(args):
     if (args.outformat == "nexus" or args.outformat == "nexusgap" or args.outformat == "phylip" or args.outformat == "clustal"):
         alignout = True
     if (alignin or alignout or args.remcols or args.remambigcols or args.remgapcols or args.remallgapcols or
-                            args.remconscols or args.subseq or args.paste or args.bestblock or
+                            args.remconscols or args.subseq or args.paste or
                             args.overlap):
         args.aligned = True
     if args.frac is not None:        # Note: value may be zero, and bool(0) = False!
@@ -287,17 +303,9 @@ def check_commandline(args):
     if args.renameregexp and  args.paste:
         raise seqlib.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
 
-    # Sanity check #9: option --bestblock is not meaningful unless several input files are provided
-    if args.bestblock and len(args.filelist) == 1:
-        raise seqlib.SeqError("Option --bestblock requires multiple input files (one for each partition)")
-
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
         raise seqlib.SeqError("Option --overlap requires multiple input files")
-
-    # Sanity check #10: option --gffsymbol requires option --gff
-    if args.gffsymbol and not args.gff:
-        raise seqlib.SeqError("Option --gffsymbol requires option --gff")
 
     return (args)
 
@@ -380,7 +388,7 @@ def read_seqs(args):
     else:
         seqs = seqlist[0]
         for seqset in seqlist[1:]:
-            if args.paste or args.bestblock:
+            if args.paste:
                 seqs.appendalignment(seqset)
             else:
                 seqs.addseqset(seqset, args.dupnamefilter)
@@ -612,7 +620,7 @@ def print_seqs(seqs, args, filehandle=sys.stdout):
     # NOTE: default is to write to stdout (print to terminal) but other filehandle can be set
 
     # Some options implies Nexus format output
-    if args.charset or args.bestblock or args.mbpartblock:
+    if args.charset or args.mbpartblock:
         args.outformat = "nexus"
 
     # Print sequences in requested format
@@ -625,7 +633,7 @@ def print_seqs(seqs, args, filehandle=sys.stdout):
     elif args.outformat == "how":
         filehandle.write(seqs.how( nocomments=args.nocomments ) + '\n')
     elif args.outformat == "nexus":
-        if (args.paste or args.overlap or args.bestblock or args.charset) and (not args.multifile):
+        if (args.paste or args.overlap or args.charset) and (not args.multifile):
             parts = True
         else:
             parts = False
@@ -648,44 +656,6 @@ def write_partitions(seqs, args):
         fh = open(outname, "w")
         print_seqs(alignment, args, filehandle=fh)
         fh.close()
-
-################################################################################################
-
-def use_gff_file(seqs, args):
-    """Reads file with GFF information, extracts annotation info, and adds to corresponding sequence objects"""
-
-    # Check that GFF file exists
-    if not os.path.isfile(args.gff):
-        raise seqlib.SeqError("File %s not found." % args.gff)
-
-    # Construct empty annotation lists for all sequences in sequence set
-    for seq in seqs:
-        seq.annotlist = ["."] * len(seq)
-        seq.comments += "'.'=Nothing; "
-        seq.annotsymbols = {"."}
-
-    # Set annotation symbol
-    if args.gffsymbol:
-        annotsymbol = args.gffsymbol
-    else:
-        annotsymbol = "A"
-
-    # Parse GFF file, add annotation to sequence objects along the way
-    for line in open(args.gff):
-        words = line.split()
-        seqname = words[0]
-        annot = words[2]
-        start = int(words[3])
-        stop = int(words[4])
-        seq = seqs.getseq(seqname)
-        seq.annotlist[start - 1:stop] = [annotsymbol] * (stop - start + 1)
-        if annotsymbol not in seq.annotsymbols:
-            seq.comments += "'{}'={}; ".format(annotsymbol, annot)
-            seq.annotsymbols.add(annotsymbol)
-
-    # Postprocess sequence set: construct seq.annotation strings from seq.annotlist lists
-    for seq in seqs:
-        seq.annotation = "".join(seq.annotlist)
 
 ################################################################################################
 
