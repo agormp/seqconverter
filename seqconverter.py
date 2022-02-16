@@ -243,13 +243,12 @@ def check_commandline(args):
     # Note: args that require manipulation of columns, and --paste also implies aligned sequences
     # (reading as alignment results in check of equal sequence lengths)
     alignin = alignout = args.aligned = False
-    if (args.informat == "nexus" or args.informat == "phylip" or args.informat == "clustal"):
+    if any([args.informat=="nexus", args.informat=="phylip", args.informat=="clustal"]):
         alignin = True
-    if (args.outformat == "nexus" or args.outformat == "nexusgap" or args.outformat == "phylip" or args.outformat == "clustal"):
+    if any([args.outformat=="nexus", args.outformat=="nexusgap", args.outformat=="phylip", args.outformat=="clustal"]):
         alignout = True
-    if (alignin or alignout or args.remcols or args.remambigcols or args.remgapcols or args.remallgapcols or
-                            args.remconscols or args.subseq or args.paste or
-                            args.overlap):
+    if any([alignin, alignout, args.remcols, args.remambigcols, args.remgapcols, args.remallgapcols,
+            args.remconscols, args.subseq, args.paste, args.overlap]):
         args.aligned = True
     if args.frac is not None:        # Note: value may be zero, and bool(0) = False!
         args.aligned = True
@@ -633,7 +632,7 @@ def print_seqs(seqs, args, filehandle=sys.stdout):
     elif args.outformat == "how":
         filehandle.write(seqs.how( nocomments=args.nocomments ) + '\n')
     elif args.outformat == "nexus":
-        if (args.paste or args.overlap or args.charset) and (not args.multifile):
+        if any([args.paste, args.overlap, args.charset]) and (not args.multifile):
             parts = True
         else:
             parts = False
