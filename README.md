@@ -6,7 +6,7 @@ The command-line program `seqconverter` can read and write text files containing
 
 ## Availability
 
-The seqconverter source code is available on GitHub: https://github.com/agormp/seqconverter and can be installed from PyPI: https://pypi.org/project/seqconverter/
+The seqconverter source code is available on GitHub: https://github.com/agormp/seqconverter. The executable can be installed from PyPI: https://pypi.org/project/seqconverter/
 
 ## Installation
 
