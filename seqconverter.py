@@ -68,7 +68,7 @@ def main():
 def build_parser():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("filelist", nargs="+", metavar='SEQFILE', help="One or more sequence files")
+    parser.add_argument("filelist", nargs="*", metavar='SEQFILE', default="-", help="One or more sequence files")
 
     #########################################################################################
 
@@ -313,7 +313,7 @@ def check_commandline(args):
 def read_seqs(args):
 
     for filename in args.filelist:
-        if not os.path.isfile(filename):
+        if filename != "-" and not os.path.isfile(filename):
             raise seqlib.SeqError("File %s not found." % filename)
 
     # Read sequences from all files
