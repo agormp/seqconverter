@@ -75,7 +75,8 @@ def build_parser():
     formatg = parser.add_argument_group("File formats")
 
     formatg.add_argument("-I", action='store', dest="informat", metavar="FORMAT", default="auto",
-                      choices=["auto", "fasta", "nexus", "phylip", "clustal", "genbank", "tab", "raw", "how"],
+                      choices=["auto", "fasta", "nexus", "phylip", "clustal", "stockholm",
+                               "genbank", "tab", "raw", "how"],
                       help="Input format: %(choices)s [default: %(default)s]")
 
     formatg.add_argument("-O", action='store', dest="outformat", metavar="FORMAT", default="fasta",
@@ -170,6 +171,9 @@ def build_parser():
     seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
                           help="Remove conserved columns from alignment")
 
+    seqpartg.add_argument("--remhmminsertcols", action="store_true", dest="remhmminsertcols",
+                          help="For output from HMMer's hmmalign: remove columns corresponding to insert states")
+
     #########################################################################################
 
     multifileg = parser.add_argument_group("Combining multiple sequence files")
@@ -243,12 +247,12 @@ def check_commandline(args):
     # Note: args that require manipulation of columns, and --paste also implies aligned sequences
     # (reading as alignment results in check of equal sequence lengths)
     alignin = alignout = args.aligned = False
-    if any([args.informat=="nexus", args.informat=="phylip", args.informat=="clustal"]):
+    if any([args.informat=="nexus", args.informat=="phylip", args.informat=="clustal", args.informat=="stockholm"]):
         alignin = True
     if any([args.outformat=="nexus", args.outformat=="nexusgap", args.outformat=="phylip", args.outformat=="clustal"]):
         alignout = True
     if any([alignin, alignout, args.remcols, args.remambigcols, args.remgapcols, args.remallgapcols,
-            args.remconscols, args.subseq, args.paste, args.overlap]):
+            args.remconscols, args.remhmminsertcols, args.subseq, args.paste, args.overlap]):
         args.aligned = True
     if args.frac is not None:        # Note: value may be zero, and bool(0) = False!
         args.aligned = True
@@ -500,6 +504,10 @@ def change_seqs(seqs, args):
     # Removal of conserved columns
     if args.remconscols:
         seqs.remconscol()
+
+    # Removal of insert state columns (in output from HMMer's hmmalign)
+    if args.remhmminsertcols:
+        seqs.rem_hmmalign_insertcol()
 
     # Extraction of subsequence
     # Note: it is assumed that indexing starts at 1, and that stop is included ("slicesyntax=False")
