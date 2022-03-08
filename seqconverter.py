@@ -38,7 +38,6 @@ def main():
             # Output to multiple files: one partition per file, in nexus format
             write_partitions(seqs, args)
         else:
-            # Output of one single sequence file to stdout.
             if args.summary:
                 print_summary(seqs, args)
             elif args.summarynames:
@@ -83,8 +82,8 @@ def build_parser():
                       choices=["fasta", "nexus", "nexusgap", "phylip", "clustal", "tab", "raw", "how"],
                       help="Output format:  %(choices)s [default: %(default)s]")
 
-    formatg.add_argument("--nocomments", action="store_true", dest="nocomments",
-                        help="Do not include comments in output (only print seqnames)")
+    formatg.add_argument("--width", action="store", type=int, dest="width", metavar="WIDTH", default=60,
+                        help="Print sequences with WIDTH characters per line [default: %(default)s]")
 
     #########################################################################################
 
@@ -172,7 +171,7 @@ def build_parser():
                           help="Remove conserved columns from alignment")
 
     seqpartg.add_argument("--remhmminsertcols", action="store_true", dest="remhmminsertcols",
-                          help="For output from HMMer's hmmalign: remove columns corresponding to insert states")
+                          help="When reading Stockholm format file from HMMer's hmmalign: remove columns corresponding to insert states")
 
     #########################################################################################
 
@@ -634,23 +633,23 @@ def print_seqs(seqs, args, filehandle=sys.stdout):
     if args.outformat == "raw":
         filehandle.write(seqs.raw() + '\n')
     elif args.outformat == "tab":
-        filehandle.write(seqs.tab( nocomments=args.nocomments ) + '\n')
+        filehandle.write(seqs.tab() + '\n')
     elif args.outformat == "fasta":
-        filehandle.write(seqs.fasta( nocomments=args.nocomments ) + '\n')
+        filehandle.write(seqs.fasta(width = args.width) + '\n')
     elif args.outformat == "how":
-        filehandle.write(seqs.how( nocomments=args.nocomments ) + '\n')
+        filehandle.write(seqs.how(width = args.width) + '\n')
     elif args.outformat == "nexus":
         if any([args.paste, args.overlap, args.charset]) and (not args.multifile):
             parts = True
         else:
             parts = False
-        filehandle.write(seqs.nexus(print_partitioned = parts) + '\n')
+        filehandle.write(seqs.nexus(print_partitioned = parts, width = args.width) + '\n')
     elif args.outformat == "nexusgap":
-        filehandle.write(seqs.nexusgap() + '\n')
+        filehandle.write(seqs.nexusgap(width = args.width) + '\n')
     elif args.outformat == "phylip":
-        filehandle.write(seqs.phylip() + '\n')
+        filehandle.write(seqs.phylip(width = args.width) + '\n')
     elif args.outformat == "clustal":
-        filehandle.write(seqs.clustal() + '\n')
+        filehandle.write(seqs.clustal(width = args.width) + '\n')
 
 ################################################################################################
 
