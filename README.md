@@ -1,6 +1,6 @@
 # seqconverter: command line program for reading, writing, and manipulating sequence files
 
-[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)![](https://img.shields.io/badge/version-2.2.0-blue)
+[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)![](https://img.shields.io/badge/version-2.3.1-blue)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
 
@@ -57,9 +57,9 @@ seqconverter -h
 
 ----------------------------------------------------------------
 
-Convert aligned sequences in fasta format to nexus (Note: output is written to the terminal so you need to use redirection to store in a file):
+Convert aligned sequences in fasta format to nexus, write sequences using 70 characters per line (Note: output is written to the terminal so you need to use redirection to store in a file):
 ```
-seqconverter -I fasta -O nexus myalignment.fasta > myalignment.nexus
+seqconverter -I fasta -O nexus --width 70 myalignment.fasta > myalignment.nexus
 ```
 
 ----------------------------------------------------------------
@@ -108,7 +108,7 @@ seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 ## Usage
 
 ```
-usage: seqconverter.py [-h] [-I FORMAT] [-O FORMAT] [--nocomments] [--rename OLD,NEW]
+usage: seqconverter.py [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--rename OLD,NEW]
                        [--renamenumber BASENAME] [--appendnumber]
                        [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
                        [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]]
@@ -135,7 +135,7 @@ File formats:
                         genbank, tab, raw, how [default: auto]
   -O FORMAT             Output format: fasta, nexus, nexusgap, phylip, clustal, tab,
                         raw, how [default: fasta]
-  --nocomments          Do not include comments in output (only print seqnames)
+  --width WIDTH         Print sequences with WIDTH characters per line [default: 60]
 
 Renaming sequences:
   --rename OLD,NEW      Rename single sequence from OLD to NEW
@@ -183,8 +183,8 @@ Extracting or removing parts of sequences:
   --remfracgapcols FRAC
                         Remove columns that contain > FRAC fraction gaps
   --remconscols         Remove conserved columns from alignment
-  --remhmminsertcols    For output from HMMer's hmmalign: remove columns corresponding
-                        to insert states
+  --remhmminsertcols    When reading Stockholm format file from HMMer's hmmalign:
+                        remove columns corresponding to insert states
 
 Combining multiple sequence files:
   --paste               Concatenate identically named sequences from separate input
