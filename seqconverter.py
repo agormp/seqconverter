@@ -35,25 +35,20 @@ def main():
         seqs = change_seqs(seqs, args)
 
         if args.multifile:
-            # Output to multiple files: one partition per file, in nexus format
             write_partitions(seqs, args)
         else:
-            if args.summary:
+            if any([args.s_allsum, args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum]):
                 print_summary(seqs, args)
-            elif args.summarynames:
-                for name in sorted(seqs.seqnamelist):
-                    print(name)
             else:
                 print_seqs(seqs, args)
 
-            if args.charset:
-                print("")
-                print(seqs.charsetblock())
+                if args.charset:
+                    print("")
+                    print(seqs.charsetblock())
 
-            if args.mbpartblock:
-                print("")
-                print(seqs.mbpartblock())
-
+                if args.mbpartblock:
+                    print("")
+                    print(seqs.mbpartblock())
 
     except seqlib.SeqError as exc:
         if args.debug:
@@ -219,11 +214,27 @@ def build_parser():
 
     summaryg = parser.add_argument_group("Summaries")
 
-    summaryg.add_argument("--summary", action="store_true", dest="summary",
-                      help="Print summary of data set (names, number, lengths, composition, etc.). No sequences are output.")
+    summaryg.add_argument("--allsum", action="store_true", dest="s_allsum",
+                      help="Print all sequence summaries")
 
-    summaryg.add_argument("--names", action="store_true", dest="summarynames",
-                      help="Print names of sequences in data set.")
+    summaryg.add_argument("--nam", action="store_true", dest="s_nam",
+                      help="Print names of sequences")
+
+    summaryg.add_argument("--num", action="store_true", dest="s_num",
+                      help="Print number of sequences")
+
+    summaryg.add_argument("--len", action="store_true", dest="s_len",
+                      help="Print summary of sequence lengths")
+
+    summaryg.add_argument("--com", action="store_true", dest="s_com",
+                      help="Print sequence composition")
+
+    summaryg.add_argument("--div", action="store_true", dest="s_div",
+                      help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference): mean and std")
+
+    summaryg.add_argument("--sitsum", action="store_true", dest="s_sitsum",
+                      help="""(For alignments) Print site summary: number of columns that are variable (not conserved),
+                              number of columns that contain gaps, and number of columns that contain IUPAC ambiguity symbols""")
 
     #########################################################################################
 
@@ -231,6 +242,7 @@ def build_parser():
 
     parser.add_argument("--debug", action="store_true", dest="debug",
                       help="Print longer error messages")
+
     #########################################################################################
 
     return parser
@@ -308,6 +320,9 @@ def check_commandline(args):
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
         raise seqlib.SeqError("Option --overlap requires multiple input files")
+
+    if args.s_allsum:
+        args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum = [True for i in range(6)]
 
     return (args)
 
@@ -556,34 +571,36 @@ def change_seqs(seqs, args):
 
 def print_summary(seqs, args):
 
-    # Print number of seqs
-    print("Number of sequences: {:10d}".format(len(seqs)))
+    if args.s_nam:
+        print("# Sequence names:")
+        for name in sorted(seqs.seqnamelist):
+            print(name)
+        print()
 
-    # Unaligned sequences
-    if not args.aligned:
-        # Print minimum, maximum, and average lengths
-        seqlenlist = []
-        lensum = 0
-        for seq in seqs:
-            seqlen = len(seq)
-            seqlenlist.append(seqlen)
-            lensum += seqlen
-        print("Minimum length:   {:13d}".format(min(seqlenlist)))
-        print("Maximum length:   {:13d}".format(max(seqlenlist)))
-        print("Average length:   {:13.2f}\n\n".format(lensum/len(seqs)))
+    if args.s_num:
+        print("Number of sequences: {:10d}".format(len(seqs)))
 
-    # Alignments:
-    else:
-        # Print alignment length
-        print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
+    if args.s_len:
+        if not args.aligned:
+            seqlenlist = []
+            lensum = 0
+            for seq in seqs:
+                seqlen = len(seq)
+                seqlenlist.append(seqlen)
+                lensum += seqlen
+            print("Minimum length:   {:13d}".format(min(seqlenlist)))
+            print("Maximum length:   {:13d}".format(max(seqlenlist)))
+            print("Average length:   {:13.2f}\n\n".format(lensum/len(seqs)))
+        else:
+            print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
 
-        # Print distance summary: nucleotide diversity (= average pairwise distance) + its standard error
-        avg, sem = seqs.sequence_diversity()
+    if args.s_div:
+        avg, std = seqs.sequence_diversity(ignoregaps=False)
         print("Nucleotide diversity pi (average pairwise sequence distance)")
         print("    Mean:               {:.5f}".format(avg))
-        print("    Standard error:     {:.5f}\n".format(sem))
+        print("    Standard dev:       {:.5f}\n".format(std))
 
-        # Print number of variable sites, number of gapcontaining sites, and number of ambiguity containing sites
+    if args.s_sitsum:
         numvar = 0
         numgap = 0
         numambig = 0
@@ -600,24 +617,24 @@ def print_summary(seqs, args):
         print("    No. gappy sites:     {:5d}".format(numgap))
         print("    No. ambiguous sites: {:5d}\n".format(numambig))
 
-    # Print composition #########################################################################################
-    compositiondict = seqs.composition()
 
-    # If any ambiguity symbols have zero counts: remove from output
-    remset = set()
-    for symbol in seqs.ambigsymbols:
-        if compositiondict[symbol][0] == 0:
-            remset.add(symbol)
-    symbols = compositiondict.keys() - remset
-    symbols = sorted(list(symbols))
+    if args.s_com:
+        compositiondict = seqs.composition()
+        # If any ambiguity symbols have zero counts: remove from output
+        remset = set()
+        for symbol in seqs.ambigsymbols:
+            if compositiondict[symbol][0] == 0:
+                remset.add(symbol)
+        symbols = compositiondict.keys() - remset
+        symbols = sorted(list(symbols))
 
-    print("Composition:")
-    print("    {:^7s}{:^8s}{:^8s}".format("Symbol", "Freq", "Count"))
-    tot_count = 0
-    for symbol in symbols:
-        tot_count += compositiondict[symbol][0]
-    for symbol in symbols:
-        print("    {:^7s}{:^8.3f}{:^8d} / {}".format(symbol, compositiondict[symbol][1], compositiondict[symbol][0], tot_count))
+        print("Composition:")
+        print("    {:^7s}{:^8s}{:^8s}".format("Symbol", "Freq", "Count"))
+        tot_count = 0
+        for symbol in symbols:
+            tot_count += compositiondict[symbol][0]
+        for symbol in symbols:
+            print("    {:^7s}{:^8.3f}{:^8d} / {}".format(symbol, compositiondict[symbol][1], compositiondict[symbol][0], tot_count))
 
 ################################################################################################
 
