@@ -215,7 +215,7 @@ def build_parser():
     summaryg = parser.add_argument_group("Summaries")
 
     summaryg.add_argument("--allsum", action="store_true", dest="s_allsum",
-                      help="Print all sequence summaries")
+                      help="Print all sequence summaries (except list of names)")
 
     summaryg.add_argument("--nam", action="store_true", dest="s_nam",
                       help="Print names of sequences")
@@ -322,7 +322,7 @@ def check_commandline(args):
         raise seqlib.SeqError("Option --overlap requires multiple input files")
 
     if args.s_allsum:
-        args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum = [True for i in range(6)]
+        args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum = [True for i in range(5)]
 
     return (args)
 
@@ -613,28 +613,30 @@ def print_summary(seqs, args):
             if (seqs.ambigsymbols & columnset):
                 numambig += 1
         print("Site summary (note: variable, gappy, and ambiguous sites may overlap)")
-        print("    No. variable sites:  {:5d}".format(numvar))
-        print("    No. gappy sites:     {:5d}".format(numgap))
-        print("    No. ambiguous sites: {:5d}\n".format(numambig))
+        print("    No. variable sites:  {:>6d}".format(numvar))
+        print("    No. gappy sites:     {:>6d}".format(numgap))
+        print("    No. ambiguous sites: {:>6d}\n".format(numambig))
 
 
     if args.s_com:
-        compositiondict = seqs.composition()
-        # If any ambiguity symbols have zero counts: remove from output
-        remset = set()
-        for symbol in seqs.ambigsymbols:
-            if compositiondict[symbol][0] == 0:
-                remset.add(symbol)
-        symbols = compositiondict.keys() - remset
-        symbols = sorted(list(symbols))
+        compositiondict = seqs.composition(ignoregaps=True)
 
         print("Composition:")
-        print("    {:^7s}{:^8s}{:^8s}".format("Symbol", "Freq", "Count"))
+        print("    {:^7s}{:>8s}{:>10s}".format("Symbol", "Freq", "Count"))
         tot_count = 0
-        for symbol in symbols:
-            tot_count += compositiondict[symbol][0]
-        for symbol in symbols:
-            print("    {:^7s}{:^8.3f}{:^8d} / {}".format(symbol, compositiondict[symbol][1], compositiondict[symbol][0], tot_count))
+        for res,(count,freq) in compositiondict.items():
+            tot_count += count
+
+        nonambig = set(compositiondict.keys()) - seqs.ambigsymbols
+        ambig = set(compositiondict.keys()) - nonambig
+        nonambig_sorted = sorted(list(nonambig))
+        ambig_sorted = sorted(list(ambig))
+        for res in nonambig_sorted:
+            count,freq = compositiondict[res]
+            print("    {:^7s}{:>8.3f}{:>10d} / {}".format(res, freq, count, tot_count))
+        for res in ambig_sorted:
+            count,freq = compositiondict[res]
+            print("    {:^7s}{:>8.3f}{:>10d} / {}".format(res, freq, count, tot_count))
 
 ################################################################################################
 
