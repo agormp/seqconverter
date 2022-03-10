@@ -37,7 +37,7 @@ def main():
         if args.multifile:
             write_partitions(seqs, args)
         else:
-            if any([args.s_allsum, args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum]):
+            if any([args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_seqcom, args.s_sit]):
                 print_summary(seqs, args)
             else:
                 print_seqs(seqs, args)
@@ -214,12 +214,6 @@ def build_parser():
 
     summaryg = parser.add_argument_group("Summaries")
 
-    summaryg.add_argument("--allsum", action="store_true", dest="s_allsum",
-                      help="Print all sequence summaries (except list of names)")
-
-    summaryg.add_argument("--nam", action="store_true", dest="s_nam",
-                      help="Print names of sequences")
-
     summaryg.add_argument("--num", action="store_true", dest="s_num",
                       help="Print number of sequences")
 
@@ -227,14 +221,24 @@ def build_parser():
                       help="Print summary of sequence lengths")
 
     summaryg.add_argument("--com", action="store_true", dest="s_com",
-                      help="Print sequence composition")
+                      help="Print overall sequence composition")
+
+    summaryg.add_argument("--seqcom", action="store_true", dest="s_seqcom",
+                      help="Print composition for each individual sequence (one line per seq)")
+
+    summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
+                      help="When reporting composition: do not count gap symbols")
+
+    summaryg.add_argument("--nam", action="store_true", dest="s_nam",
+                      help="Print names of sequences")
 
     summaryg.add_argument("--div", action="store_true", dest="s_div",
                       help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference): mean and std")
 
-    summaryg.add_argument("--sitsum", action="store_true", dest="s_sitsum",
+    summaryg.add_argument("--sit", action="store_true", dest="s_sit",
                       help="""(For alignments) Print site summary: number of columns that are variable (not conserved),
                               number of columns that contain gaps, and number of columns that contain IUPAC ambiguity symbols""")
+
 
     #########################################################################################
 
@@ -320,9 +324,6 @@ def check_commandline(args):
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
         raise seqlib.SeqError("Option --overlap requires multiple input files")
-
-    if args.s_allsum:
-        args.s_len, args.s_num, args.s_div, args.s_com, args.s_sitsum = [True for i in range(5)]
 
     return (args)
 
@@ -600,7 +601,7 @@ def print_summary(seqs, args):
         print("    Mean:               {:.5f}".format(avg))
         print("    Standard dev:       {:.5f}\n".format(std))
 
-    if args.s_sitsum:
+    if args.s_sit:
         numvar = 0
         numgap = 0
         numambig = 0
@@ -619,7 +620,7 @@ def print_summary(seqs, args):
 
 
     if args.s_com:
-        compositiondict = seqs.composition(ignoregaps=True)
+        compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
 
         print("Composition:")
         print("    {:^7s}{:>8s}{:>10s}".format("Symbol", "Freq", "Count"))
@@ -627,7 +628,7 @@ def print_summary(seqs, args):
         for res,(count,freq) in compositiondict.items():
             tot_count += count
 
-        nonambig = set(compositiondict.keys()) - seqs.ambigsymbols
+        nonambig = set(compositiondict.keys()) - seqs.ambigsymbols - set("-")
         ambig = set(compositiondict.keys()) - nonambig
         nonambig_sorted = sorted(list(nonambig))
         ambig_sorted = sorted(list(ambig))
@@ -637,6 +638,30 @@ def print_summary(seqs, args):
         for res in ambig_sorted:
             count,freq = compositiondict[res]
             print("    {:^7s}{:>8.3f}{:>10d} / {}".format(res, freq, count, tot_count))
+        print()
+
+    if args.s_seqcom:
+        longestname = max(seqs.getnames(), key=len)
+        maxlenname = max(len(longestname), len("name"))
+        print("{name:<{nl}s}{res:^8s}{f:>8s}{n:>10s}{l:>10s}".format(name="name", nl=maxlenname+2,
+                                                                    res="residue", f="freq",
+                                                                    n="count", l="length"))
+        for seq in seqs:
+            length = len(seq)
+            name = seq.name
+            compositiondict = seq.composition(ignoregaps=args.s_ignoregaps)
+            nonambig = set(compositiondict.keys()) - seq.ambigsymbols - set("-")
+            ambig = set(compositiondict.keys()) - nonambig
+            nonambig_sorted = sorted(list(nonambig))
+            ambig_sorted = sorted(list(ambig))
+            for res in nonambig_sorted:
+                count,freq = compositiondict[res]
+                print("{name:<{nl}s}{res:^8s}{f:>8.4f}{n:>10d}{l:>10d}".format(name=name, nl=maxlenname+2,
+                                                                            res=res, f=freq, n=count, l=length))
+            for res in ambig_sorted:
+                count,freq = compositiondict[res]
+                print("{name:<{nl}s}{res:^8s}{f:>8.4f}{n:>10d}{l:>10d}".format(name=name, nl=maxlenname+2,
+                                                                            res=res, f=freq, n=count, l=length))
 
 ################################################################################################
 
