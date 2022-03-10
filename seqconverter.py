@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Anders Gorm Pedersen, agpe@dtu.dk, 2012-2021
+# Anders Gorm Pedersen, agpe@dtu.dk, 2012-2022
 # Section for Bioinformatics, DTU Health Technology, Technical University of Denmark
 # Converts between different sequence file formats. Performs various manipulations on sequences
 
@@ -604,7 +604,7 @@ def print_summary(seqs, args):
         numvar = 0
         numgap = 0
         numambig = 0
-        for i, col in enumerate(seqs.columns()):
+        for col in seqs.columns():
             columnset = set(col)
             if len(columnset) != 1:        # nvalues == 1 <=> conserved column
                 numvar += 1
