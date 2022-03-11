@@ -1,6 +1,6 @@
 # seqconverter: command line program for reading, writing, and manipulating sequence files
 
-[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)![](https://img.shields.io/badge/version-2.4.0-blue)
+[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)![](https://img.shields.io/badge/version-2.5.1-blue)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
 
@@ -108,21 +108,19 @@ seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 ## Usage
 
 ```
-usage: seqconverter.py [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH]
-                       [--rename OLD,NEW] [--renamenumber BASENAME]
-                       [--appendnumber] [--renameregexp "REGEXP"] [--regdupfix]
-                       [--savenames FILE] [--restorenames FILE]
-                       [--gbname FIELD1[,FIELD2,FIELD3,...]] [--subsample N]
-                       [--subset NAMEFILE] [--remseqs NAMEFILE]
+usage: seqconverter.py [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--rename OLD,NEW]
+                       [--renamenumber BASENAME] [--appendnumber]
+                       [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
+                       [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]]
+                       [--subsample N] [--subset NAMEFILE] [--remseqs NAMEFILE]
                        [--filterpos VARIANT[,VARIANT,...]] [--filterdupseq]
                        [--filterdupname] [--subseq START,STOP] [--subseqrename]
                        [--windows WSIZE] [--degap] [--remcols INDEX LIST]
                        [--remambigcols] [--remgapcols] [--remallgapcols]
                        [--remfracgapcols FRAC] [--remconscols] [--remhmminsertcols]
-                       [--paste] [--overlap] [--minoverlap N] [--multifile]
-                       [--charset] [--mbpartblock] [--revcomp] [--translate]
-                       [--num] [--len] [--com] [--seqcom] [--ignoregaps] [--nam]
-                       [--div] [--sit] [--debug]
+                       [--paste] [--overlap] [--minoverlap N] [--multifile] [--charset]
+                       [--mbpartblock] [--revcomp] [--translate] [--num] [--len] [--com]
+                       [--seqcom] [--ignoregaps] [--nam] [--div] [--sit] [--debug]
                        [SEQFILE ...]
 
 positional arguments:
@@ -133,29 +131,28 @@ optional arguments:
   --debug               Print longer error messages
 
 File formats:
-  -I FORMAT             Input format: auto, fasta, nexus, phylip, clustal,
-                        stockholm, genbank, tab, raw, how [default: auto]
-  -O FORMAT             Output format: fasta, nexus, nexusgap, phylip, clustal,
-                        tab, raw, how [default: fasta]
-  --width WIDTH         Print sequences with WIDTH characters per line [default:
-                        60]
+  -I FORMAT             Input format: auto, fasta, nexus, phylip, clustal, stockholm,
+                        genbank, tab, raw, how [default: auto]
+  -O FORMAT             Output format: fasta, nexus, nexusgap, phylip, clustal, tab, raw,
+                        how [default: fasta]
+  --width WIDTH         Print sequences with WIDTH characters per line [default: 60]
 
 Renaming sequences:
   --rename OLD,NEW      Rename single sequence from OLD to NEW
   --renamenumber BASENAME
                         Rename all sequences to this form: BASENAME_001, ...
-  --appendnumber        Append numbering at end of existing sequence names
-                        (SeqA_001, SeqXYZ_002, ...
+  --appendnumber        Append numbering at end of existing sequence names (SeqA_001,
+                        SeqXYZ_002, ...
   --renameregexp "REGEXP"
-                        Rename sequences by deleting parts of names matching
-                        regular expression in REGEXP
-  --regdupfix           Fix duplicate names, created by regexp, by appending
-                        numbers to duplicates (seqA, seqA_2, ...)
+                        Rename sequences by deleting parts of names matching regular
+                        expression in REGEXP
+  --regdupfix           Fix duplicate names, created by regexp, by appending numbers to
+                        duplicates (seqA, seqA_2, ...)
   --savenames FILE      Save renaming information in FILE for later use
   --restorenames FILE   Restore original names using info previously saved in FILE
   --gbname FIELD1[,FIELD2,FIELD3,...]
-                        For Genbank input: construct sequence names from the list
-                        of named fields, in the specified order
+                        For Genbank input: construct sequence names from the list of
+                        named fields, in the specified order
 
 Retrieve subset of sequences:
   --subsample N         Randomly extract N sequences from sequence set
@@ -165,77 +162,75 @@ Retrieve subset of sequences:
                         Retrieve sequences containing specific residues on specific
                         positions. Syntax is: <POS><RESIDUE>, possibly in a comma-
                         separated list. Example: 484K,501Y
-  --filterdupseq        Remove duplicate sequences (keeping one of each); print
-                        names of removed sequences on stderr.
-  --filterdupname       Remove sequences with duplicate names (keeping one of
-                        each). If this option is not set (default): stop execution
-                        on duplicate names.
+  --filterdupseq        Remove duplicate sequences (keeping one of each); print names of
+                        removed sequences on stderr.
+  --filterdupname       Remove sequences with duplicate names (keeping one of each). If
+                        this option is not set (default): stop execution on duplicate
+                        names.
 
 Extracting or removing parts of sequences:
-  --subseq START,STOP   Extract subsequence, positions START to STOP, from
-                        alignment
-  --subseqrename        When extracting sub-sequences: add '_START_STOP' to
-                        seqnames
+  --subseq START,STOP   Extract subsequence, positions START to STOP, from alignment
+  --subseqrename        When extracting sub-sequences: add '_START_STOP' to seqnames
   --windows WSIZE       Extract all overlapping sequence windows of size WSIZE
   --degap               Remove all gap characters from sequences
-  --remcols INDEX LIST  Remove listed columns from alignment. Columns can be
-                        indicated as comma-separated list of indices, and as
-                        ranges. Example: --remcols=10,15,22-40,57
-  --remambigcols        Remove columns where one or more residues are ambiguity
-                        symbols (e.g., N for nucleotides)
+  --remcols INDEX LIST  Remove listed columns from alignment. Columns can be indicated as
+                        comma-separated list of indices, and as ranges. Example:
+                        --remcols=10,15,22-40,57
+  --remambigcols        Remove columns where one or more residues are ambiguity symbols
+                        (e.g., N for nucleotides)
   --remgapcols          Remove columns where one or more residues are gaps
   --remallgapcols       Remove columns that are all-gaps
   --remfracgapcols FRAC
                         Remove columns that contain > FRAC fraction gaps
   --remconscols         Remove conserved columns from alignment
-  --remhmminsertcols    When reading Stockholm format file from HMMer's hmmalign:
-                        remove columns corresponding to insert states
+  --remhmminsertcols    When reading Stockholm format file from HMMer's hmmalign: remove
+                        columns corresponding to insert states
 
 Combining multiple sequence files:
   --paste               Concatenate identically named sequences from separate input
-                        files. Sequences are pasted end to end in the same order as
-                        the input files. All input files must contain same number
-                        of sequences, and sequences in different files must have
-                        same name.(To see partitions choose nexus output, or output
-                        to multiple partition files).
-  --overlap             Similar to --paste, but for input alignments that overlap
-                        partly. Overlap is discovered automatically and partition
-                        boundaries are then set such that each partition is covered
-                        by a unique set of genes. (To see partitions choose nexus
-                        output, or output to multiple partition files).
-  --minoverlap N        Minimum overlap required for merging input alignments
-                        (default: set automatically based on seq lengths)
-  --multifile           Outputs to multiple files (one per partition) instead of
-                        stdout. Partitions are generated automatically based on
-                        other options.
+                        files. Sequences are pasted end to end in the same order as the
+                        input files. All input files must contain same number of
+                        sequences, and sequences in different files must have same
+                        name.(To see partitions choose nexus output, or output to
+                        multiple partition files).
+  --overlap             Similar to --paste, but for input alignments that overlap partly.
+                        Overlap is discovered automatically and partition boundaries are
+                        then set such that each partition is covered by a unique set of
+                        genes. (To see partitions choose nexus output, or output to
+                        multiple partition files).
+  --minoverlap N        Minimum overlap required for merging input alignments (default:
+                        set automatically based on seq lengths)
+  --multifile           Outputs to multiple files (one per partition) instead of stdout.
+                        Partitions are generated automatically based on other options.
   --charset             Appends Nexus form charset block listing partitions in data
-                        (forces output in Nexus format). Charsets and partitions
-                        are generated automatically based on other options.
+                        (forces output in Nexus format). Charsets and partitions are
+                        generated automatically based on other options.
   --mbpartblock         Appends MrBayes block with commands for running partitioned
-                        analysis (forces output in Nexus format). Charsets and
-                        partitions are generated automatically based on other
-                        options.
+                        analysis (forces output in Nexus format). Charsets and partitions
+                        are generated automatically based on other options.
 
 DNA manipulations:
-  --revcomp             Return reverse complement of sequence(s). Requires
-                        sequences to be DNA.
-  --translate           Translate DNA into amino acid sequences (requires sequences
-                        to be DNA, in frame, and length multiple of 3)
+  --revcomp             Return reverse complement of sequence(s). Requires sequences to
+                        be DNA.
+  --translate           Translate DNA into amino acid sequences (requires sequences to be
+                        DNA, in frame, and length multiple of 3)
 
 Summaries:
+  No sequences are printed when these options are used
+
   --num                 Print number of sequences
   --len                 Print summary of sequence lengths
   --com                 Print overall sequence composition
-  --seqcom              Print composition for each individual sequence (one line
-                        per seq)
+  --seqcom              Print composition for each individual sequence. Output is one
+                        line per residue-type per sequence: seqname, residue-type, freq,
+                        count, seqlength
   --ignoregaps          When reporting composition: do not count gap symbols
   --nam                 Print names of sequences
-  --div                 (For alignments) Print nucleotide diversity (=average
-                        pairwise sequence difference): mean and std
-  --sit                 (For alignments) Print site summary: number of columns that
-                        are variable (not conserved), number of columns that
-                        contain gaps, and number of columns that contain IUPAC
-                        ambiguity symbols
+  --div                 (For alignments) Print nucleotide diversity (=average pairwise
+                        sequence difference): mean and std
+  --sit                 (For alignments) Print site summary: number of columns that are
+                        variable (not conserved), number of columns that contain gaps,
+                        and number of columns that contain IUPAC ambiguity symbols
 ```
 
 
