@@ -212,7 +212,7 @@ def build_parser():
 
     #########################################################################################
 
-    summaryg = parser.add_argument_group("Summaries")
+    summaryg = parser.add_argument_group("Summaries", description="No sequences are printed when these options are used")
 
     summaryg.add_argument("--num", action="store_true", dest="s_num",
                       help="Print number of sequences")
@@ -224,7 +224,7 @@ def build_parser():
                       help="Print overall sequence composition")
 
     summaryg.add_argument("--seqcom", action="store_true", dest="s_seqcom",
-                      help="Print composition for each individual sequence (one line per seq)")
+                      help="Print composition for each individual sequence. Output is one line per residue-type per sequence: seqname, residue-type, freq, count, seqlength")
 
     summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
                       help="When reporting composition: do not count gap symbols")
