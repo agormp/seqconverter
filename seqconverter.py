@@ -24,7 +24,8 @@ def main():
 
     try:
         args = check_commandline(args)
-        seqs = read_seqs(args)
+        seqs,args = read_seqs(args)
+        check_args_alignment_issues(args)
 
         if args.dupseqfilter:
             seqs = filterdupseqs(seqs)
@@ -261,6 +262,7 @@ def check_commandline(args):
     # Set flags indicating whether input and/or output is aligned, and whether file should be read as alignment
     # Note: args that require manipulation of columns, and --paste also implies aligned sequences
     # (reading as alignment results in check of equal sequence lengths)
+    # Note 2: This is somewhat messy. Should really be handled by argparse mutually exclusive arguments
     alignin = alignout = args.aligned = False
     if any([args.informat=="nexus", args.informat=="phylip", args.informat=="clustal", args.informat=="stockholm"]):
         alignin = True
@@ -279,17 +281,15 @@ def check_commandline(args):
     # Perform sanity checks on combination of args
     # (Note: if autodetection of filetype is requested, then many checks are impossible - defer error checking to seqlib)
 
-    # Sanity check #1: option --degap cannot be used together with args --remgapcols, --remallgapcols, or --remconscols
-    if args.degap and args.remgapcols:
-        raise seqlib.SeqError("Options --degap and --remgapcols cannot be used simultaneously")
-    if args.degap and args.remallgapcols:
-        raise seqlib.SeqError("Options --degap and --remallgapcols cannot be used simultaneously")
-    if args.degap and args.remconscols:
-        raise seqlib.SeqError("Options --degap and --remconscols cannot be used simultaneously")
+    # Sanity check #1: option --degap cannot be used with any option that requires aligned sequences
+    if args.degap and any([args.subseq, args.remambigcols, args.remgapcols, args.remallgapcols, args.remconscols,
+                           args.frac, args.remhmminsertcols, args.mbpartblock, args.charset, args.multifile,
+                           args.overlap, args.s_div, args.s_sit, args.paste]):
+        raise seqlib.SeqError("Option --degap cannot be used with any option that requires aligned sequences".format(args.outformat))
 
     # Sanity check #2: option --degap cannot be used if output is an alignment
     if args.degap and alignout:
-        raise seqlib.SeqError("Removal of all gap characters (--degap) cannot be performed on aligned sequences")
+        raise seqlib.SeqError("Removal of all gap characters (--degap) not possible for output in {}".format(args.outformat))
 
     # Sanity check #3: option --subseq cannot be used together with args --remambigcols, --remgapcols, --remallgapcols or --remconscols
     if args.subseq and args.remambigcols:
@@ -411,7 +411,46 @@ def read_seqs(args):
             else:
                 seqs.addseqset(seqset, args.dupnamefilter)
 
-    return seqs
+    return seqs, args
+
+################################################################################################
+
+def check_args_alignment_issues(args):
+    # After read_seqs we know whether sequences correspond to alignment.
+    # Check if any requested option clashes with alignment status
+    if not args.aligned:
+        bad_options_list = []
+        if args.subseq:
+            bad_options_list.append("--subseq")
+        if args.remambigcols:
+            bad_options_list.append("--remambigcols")
+        if args.remgapcols:
+            bad_options_list.append("--remgapcols")
+        if args.remallgapcols:
+            bad_options_list.append("--remallgapcols")
+        if args.frac:
+            bad_options_list.append("--remfracgapcols")
+        if args.remconscols:
+            bad_options_list.append("--remconscols")
+        if args.remhmminsertcols:
+            bad_options_list.append("--remhmminsertcols")
+        if args.mbpartblock:
+            bad_options_list.append("--mbpartblock")
+        if args.charset:
+            bad_options_list.append("--charset")
+        if args.multifile:
+            bad_options_list.append("--multifile")
+        if args.overlap:
+            bad_options_list.append("--overlap")
+        if args.s_div:
+            bad_options_list.append("--div")
+        if args.s_sit:
+            bad_options_list.append("--sit")
+        if args.paste:
+            bad_options_list.append("--paste")
+        if bad_options_list:
+            bad_option_string = ", ".join(bad_options_list)
+            raise SeqError("The option(s) below require aligned sequences:\n\t{}".format(bad_option_string))
 
 ################################################################################################
 
@@ -480,6 +519,7 @@ def change_seqs(seqs, args):
     if args.degap:
         # If sequences have been read as alignment: first convert to Seq_set:
         if args.aligned:
+            args.aligned = False
             newseqs = seqlib.Seq_set()
             for seq in seqs:
                 newseqs.addseq(seq)
