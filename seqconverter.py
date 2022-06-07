@@ -339,7 +339,7 @@ def read_seqs(args):
     seqlist = []          # List of either Seq_set or Seq_alignment objects
     for filename in args.filelist:
         if args.gbname:
-            seqfile = seqlib.Genbankfilehandle(filename, namefromfeatures=args.gbname)
+            seqfile = seqlib.Genbankfilehandle(filename, namefromfields=args.gbname)
         else:
             seqfile = seqlib.Seqfile(filename, args.informat)
 
