@@ -14,6 +14,12 @@ The seqconverter source code is available on GitHub: https://github.com/agormp/s
 python3 -m pip install seqconverter
 ```
 
+Upgrading to latest version:
+
+```
+python3 -m pip install --upgrade seqconverter
+```
+
 ## Dependencies
 
 seqconverter relies on the [sequencelib library](https://github.com/agormp/sequencelib) and the [NumPy package](https://numpy.org), which are automatically included when using pip to install.
