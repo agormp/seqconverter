@@ -636,7 +636,7 @@ def print_summary(seqs, args):
             print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
 
     if args.s_div:
-        avg, std = seqs.sequence_diversity(ignoregaps=False)
+        avg, std = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
         print("Nucleotide diversity pi (average pairwise sequence distance)")
         print("    Mean:               {:.5f}".format(avg))
         print("    Standard dev:       {:.5f}\n".format(std))
