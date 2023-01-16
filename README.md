@@ -1,4 +1,4 @@
-# seqconverter: command line program for reading, writing, and manipulating sequence files
+# seqconverter
 
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)![](https://img.shields.io/badge/version-2.5.8-blue)
 
