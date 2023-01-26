@@ -83,34 +83,6 @@ def build_parser():
 
     #########################################################################################
 
-    renameg = parser.add_argument_group("Renaming sequences")
-
-    renameg.add_argument("--rename", action="store", dest="rename", metavar="OLD,NEW",
-                          help="Rename single sequence from OLD to NEW")
-
-    renameg.add_argument("--renamenumber", action="store", dest="renamenumber", metavar="BASENAME",
-                          help="Rename all sequences to this form: BASENAME_001, ...")
-
-    renameg.add_argument("--appendnumber", action="store_true", dest="appendnumber",
-                          help="Append numbering at end of existing sequence names (SeqA_001, SeqXYZ_002, ...")
-
-    renameg.add_argument("--renameregexp", action="store", dest="renameregexp", metavar='"REGEXP"',
-                          help="Rename sequences by deleting parts of names matching regular expression in REGEXP")
-
-    renameg.add_argument("--regdupfix", action="store_true", dest="fixdupnames",
-                        help="Fix duplicate names, created by regexp, by appending numbers to duplicates (seqA, seqA_2, ...)")
-
-    renameg.add_argument("--savenames", action="store", dest="savenamefile", metavar="FILE",
-                          help="Save renaming information in FILE for later use")
-
-    renameg.add_argument("--restorenames", action="store", dest="restorenames", metavar="FILE",
-                          help="Restore original names using info previously saved in FILE")
-
-    renameg.add_argument("--gbname", action="store", dest="gbname", metavar="FIELD1[,FIELD2,FIELD3,...]",
-                        help="For Genbank input: construct sequence names from the list of named fields, in the specified order")
-
-    #########################################################################################
-
     subsetg = parser.add_argument_group("Retrieve subset of sequences")
 
     subsetg.add_argument("--subsample", action="store", type=int, dest="samplesize", metavar="N",
@@ -168,6 +140,34 @@ def build_parser():
 
     seqpartg.add_argument("--remhmminsertcols", action="store_true", dest="remhmminsertcols",
                           help="When reading Stockholm format file from HMMer's hmmalign: remove columns corresponding to insert states")
+
+    #########################################################################################
+
+    renameg = parser.add_argument_group("Renaming sequences")
+
+    renameg.add_argument("--rename", action="store", dest="rename", metavar="OLD,NEW",
+                          help="Rename single sequence from OLD to NEW")
+
+    renameg.add_argument("--renamenumber", action="store", dest="renamenumber", metavar="BASENAME",
+                          help="Rename all sequences to this form: BASENAME_001, ...")
+
+    renameg.add_argument("--appendnumber", action="store_true", dest="appendnumber",
+                          help="Append numbering at end of existing sequence names (SeqA_001, SeqXYZ_002, ...")
+
+    renameg.add_argument("--renameregexp", action="store", dest="renameregexp", metavar='"REGEXP"',
+                          help="Rename sequences by deleting parts of names matching regular expression in REGEXP")
+
+    renameg.add_argument("--regdupfix", action="store_true", dest="fixdupnames",
+                        help="Fix duplicate names, created by regexp, by appending numbers to duplicates (seqA, seqA_2, ...)")
+
+    renameg.add_argument("--savenames", action="store", dest="savenamefile", metavar="FILE",
+                          help="Save renaming information in FILE for later use")
+
+    renameg.add_argument("--restorenames", action="store", dest="restorenames", metavar="FILE",
+                          help="Restore original names using info previously saved in FILE")
+
+    renameg.add_argument("--gbname", action="store", dest="gbname", metavar="FIELD1[,FIELD2,FIELD3,...]",
+                        help="For Genbank input: construct sequence names from the list of named fields, in the specified order")
 
     #########################################################################################
 
