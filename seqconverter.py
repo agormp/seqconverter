@@ -89,11 +89,14 @@ def build_parser():
     subsetg.add_argument("--subsample", action="store", type=int, dest="samplesize", metavar="N",
                         help="Randomly extract N sequences from sequence set")
 
+    subsetg.add_argument("--select", action="store", metavar='"REGEXP"',
+                          help="Select sequences with names matching regular expression in REGEXP")
+
+    subsetg.add_argument("--discard", action="store", metavar='"REGEXP"',
+                          help="Discard sequences with names matching regular expression in REGEXP")
+
     subsetg.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
                         help="Retrieve sequences listed in NAMEFILE")
-
-    subsetg.add_argument("--select", action="store", dest="select", metavar='"REGEXP"',
-                          help="Select sequences with names matching regular expression in REGEXP")
 
     subsetg.add_argument("--remseqs", action="store", dest="remfile", metavar="NAMEFILE",
                         help="Discard sequences listed in NAMEFILE")
@@ -501,15 +504,6 @@ def change_seqs(seqs, args):
     if args.samplesize:
         seqs = seqs.subsample(args.samplesize)
 
-    # Extract sequences named in options.namefile
-    if args.namefile:
-        namelist = []
-        namef = open(args.namefile)
-        for line in namef:
-            namelist.append(line.strip())
-        namef.close()
-        seqs = seqs.subset(namelist)
-
     # Extract sequences whose names match regexp in "select"
     if args.select:
         newseqs = seqlib.Seq_set()
@@ -518,6 +512,24 @@ def change_seqs(seqs, args):
             if re.search(regexp, seq.name):
                 newseqs.addseq(seq)
         seqs = newseqs
+
+    # Discard sequences whose names match regexp in "discard"
+    if args.discard:
+        newseqs = seqlib.Seq_set()
+        regexp = args.discard
+        for seq in seqs:
+            if not re.search(regexp, seq.name):
+                newseqs.addseq(seq)
+        seqs = newseqs
+
+    # Extract sequences named in options.namefile
+    if args.namefile:
+        namelist = []
+        namef = open(args.namefile)
+        for line in namef:
+            namelist.append(line.strip())
+        namef.close()
+        seqs = seqs.subset(namelist)
 
     # Remove sequences named in args.remfile
     if args.remfile:
