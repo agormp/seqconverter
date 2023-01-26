@@ -90,10 +90,10 @@ def build_parser():
                         help="Randomly extract N sequences from sequence set")
 
     subsetg.add_argument("--select", action="store", metavar='"REGEXP"',
-                          help="Select sequences with names matching regular expression in REGEXP")
+                          help="Select sequences where substring of name matches regular expression")
 
     subsetg.add_argument("--discard", action="store", metavar='"REGEXP"',
-                          help="Discard sequences with names matching regular expression in REGEXP")
+                          help="Discard sequences where substring of name matches regular expression")
 
     subsetg.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
                         help="Retrieve sequences listed in NAMEFILE")
