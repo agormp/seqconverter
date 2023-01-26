@@ -1,6 +1,6 @@
 # seqconverter
 
-![](https://img.shields.io/badge/version-2.6.0-blue)
+![](https://img.shields.io/badge/version-2.7.0-blue)
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, Stockholm, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
@@ -82,6 +82,14 @@ Select all sequences whose name match the regular expression "seq_1[0-9]+":
 ```
 seqconverter -I fasta -O fasta --select "seq_1[0-9]+" myseqs.fasta > subset.fasta
 ```
+
+----------------------------------------------------------------
+
+Discard all sequences whose name match the regular expression "seq_1[0-9]+":
+```
+seqconverter -I fasta -O fasta --discard "seq_1[0-9]+" myseqs.fasta > subset.fasta
+```
+
 ----------------------------------------------------------------
 
 Extract all sequences containing a Lysine at position 484 and a Tyrosine at position 501 from set of amino acid sequences:
@@ -121,20 +129,20 @@ seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 ## Usage
 
 ```
-usage: seqconverter    [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--subsample N]
-                       [--subset NAMEFILE] [--select "REGEXP"] [--remseqs NAMEFILE]
-                       [--filterpos VARIANT[,VARIANT,...]] [--filterdupseq]
-                       [--filterdupname] [--subseq START,STOP] [--subseqrename]
-                       [--windows WSIZE] [--degap] [--remcols INDEX LIST] [--remambigcols]
-                       [--remgapcols] [--remallgapcols] [--remfracgapcols FRAC]
-                       [--remconscols] [--remhmminsertcols] [--rename OLD,NEW]
-                       [--renamenumber BASENAME] [--appendnumber]
-                       [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
-                       [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]]
-                       [--paste] [--overlap] [--minoverlap N] [--multifile] [--charset]
-                       [--mbpartblock] [--revcomp] [--translate] [--num] [--len] [--com]
-                       [--seqcom] [--ignoregaps] [--nam] [--div] [--sit] [--debug]
-                       [SEQFILE ...]
+usage: seqconverter [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--subsample N]
+                    [--select "REGEXP"] [--discard "REGEXP"] [--subset NAMEFILE]
+                    [--remseqs NAMEFILE] [--filterpos VARIANT[,VARIANT,...]]
+                    [--filterdupseq] [--filterdupname] [--subseq START,STOP]
+                    [--subseqrename] [--windows WSIZE] [--degap] [--remcols INDEX LIST]
+                    [--remambigcols] [--remgapcols] [--remallgapcols]
+                    [--remfracgapcols FRAC] [--remconscols] [--remhmminsertcols]
+                    [--rename OLD,NEW] [--renamenumber BASENAME] [--appendnumber]
+                    [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
+                    [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]] [--paste]
+                    [--overlap] [--minoverlap N] [--multifile] [--charset] [--mbpartblock]
+                    [--revcomp] [--translate] [--num] [--len] [--com] [--seqcom]
+                    [--ignoregaps] [--nam] [--div] [--sit] [--debug]
+                    [SEQFILE ...]
 
 positional arguments:
   SEQFILE               One or more sequence files
@@ -152,8 +160,9 @@ File formats:
 
 Retrieve subset of sequences:
   --subsample N         Randomly extract N sequences from sequence set
-  --subset NAMEFILE     Retrieve sequences listed in NAMEFILE
   --select "REGEXP"     Select sequences with names matching regular expression in REGEXP
+  --discard "REGEXP"    Discard sequences with names matching regular expression in REGEXP
+  --subset NAMEFILE     Retrieve sequences listed in NAMEFILE
   --remseqs NAMEFILE    Discard sequences listed in NAMEFILE
   --filterpos VARIANT[,VARIANT,...]
                         Retrieve sequences containing specific residues on specific
