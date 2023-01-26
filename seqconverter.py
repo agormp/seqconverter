@@ -15,6 +15,7 @@ import sys
 import os.path
 import sequencelib as seqlib
 import argparse
+import re
 
 ################################################################################################
 
@@ -90,6 +91,9 @@ def build_parser():
 
     subsetg.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
                         help="Retrieve sequences listed in NAMEFILE")
+
+    subsetg.add_argument("--select", action="store", dest="select", metavar='"REGEXP"',
+                          help="Select sequences with names matching regular expression in REGEXP")
 
     subsetg.add_argument("--remseqs", action="store", dest="remfile", metavar="NAMEFILE",
                         help="Discard sequences listed in NAMEFILE")
@@ -505,6 +509,15 @@ def change_seqs(seqs, args):
             namelist.append(line.strip())
         namef.close()
         seqs = seqs.subset(namelist)
+
+    # Extract sequences whose names match regexp in "select"
+    if args.select:
+        newseqs = seqlib.Seq_set()
+        regexp = args.select
+        for seq in seqs:
+            if re.search(regexp, seq.name):
+                newseqs.addseq(seq)
+        seqs = newseqs
 
     # Remove sequences named in args.remfile
     if args.remfile:
