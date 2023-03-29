@@ -242,7 +242,8 @@ def build_parser():
                       help="Print names of sequences")
 
     summaryg.add_argument("--div", action="store_true", dest="s_div",
-                      help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference): mean and std")
+                      help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference):"
+                      + " mean, std, min, max")
 
     summaryg.add_argument("--sit", action="store_true", dest="s_sit",
                       help="""(For alignments) Print site summary: number of columns that are variable (not conserved),
