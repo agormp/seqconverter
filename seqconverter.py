@@ -12,6 +12,7 @@
 ##########################################################################################
 
 import sys
+import math
 import os.path
 import sequencelib as seqlib
 import argparse
@@ -127,7 +128,7 @@ def build_parser():
     seqpartg.add_argument("--degap", action="store_true", dest="degap",
                           help="Remove all gap characters from sequences")
 
-    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEX LIST",
+    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEX-LIST",
                           help="Remove listed columns from alignment. Columns can be indicated as comma-separated list of indices, and as ranges. Example: --remcols=10,15,22-40,57")
 
     seqpartg.add_argument("--remambigcols", action="store_true", dest="remambigcols",
@@ -661,10 +662,12 @@ def print_summary(seqs, args):
             print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
 
     if args.s_div:
-        avg, std = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
+        avg, std, minpi, maxpi = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
         print("Nucleotide diversity pi (average pairwise sequence distance)")
-        print("    Mean:               {:.5f}".format(avg))
-        print("    Standard dev:       {:.5f}\n".format(std))
+        print(f"    Mean:               {avg:.5f}".format())
+        print(f"    Standard dev:       {std:.5f}".format())
+        print(f"    Min:                {minpi:.5f}")
+        print(f"    Max:                {maxpi:.5f}\n")
 
     if args.s_sit:
         numvar = 0
