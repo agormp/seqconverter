@@ -133,7 +133,7 @@ usage: seqconverter [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--subsample N]
                     [--select "REGEXP"] [--discard "REGEXP"] [--subset NAMEFILE]
                     [--remseqs NAMEFILE] [--filterpos VARIANT[,VARIANT,...]]
                     [--filterdupseq] [--filterdupname] [--subseq START,STOP]
-                    [--subseqrename] [--windows WSIZE] [--degap] [--remcols INDEX LIST]
+                    [--subseqrename] [--windows WSIZE] [--degap] [--remcols INDEX-LIST]
                     [--remambigcols] [--remgapcols] [--remallgapcols]
                     [--remfracgapcols FRAC] [--remconscols] [--remhmminsertcols]
                     [--rename OLD,NEW] [--renamenumber BASENAME] [--appendnumber]
@@ -160,14 +160,15 @@ File formats:
 
 Retrieve subset of sequences:
   --subsample N         Randomly extract N sequences from sequence set
-  --select "REGEXP"     Select sequences with names matching regular expression in REGEXP
-  --discard "REGEXP"    Discard sequences with names matching regular expression in REGEXP
+  --select "REGEXP"     Select sequences where substring of name matches regular expression
+  --discard "REGEXP"    Discard sequences where substring of name matches regular
+                        expression
   --subset NAMEFILE     Retrieve sequences listed in NAMEFILE
   --remseqs NAMEFILE    Discard sequences listed in NAMEFILE
   --filterpos VARIANT[,VARIANT,...]
                         Retrieve sequences containing specific residues on specific
-                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-
-                        separated list. Example: 484K,501Y
+                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-separated
+                        list. Example: 484K,501Y
   --filterdupseq        Remove duplicate sequences (keeping one of each); print names of
                         removed sequences on stderr.
   --filterdupname       Remove sequences with duplicate names (keeping one of each). If
@@ -179,7 +180,7 @@ Extracting or removing parts of sequences:
   --subseqrename        When extracting sub-sequences: add '_START_STOP' to seqnames
   --windows WSIZE       Extract all overlapping sequence windows of size WSIZE
   --degap               Remove all gap characters from sequences
-  --remcols INDEX LIST  Remove listed columns from alignment. Columns can be indicated as
+  --remcols INDEX-LIST  Remove listed columns from alignment. Columns can be indicated as
                         comma-separated list of indices, and as ranges. Example:
                         --remcols=10,15,22-40,57
   --remambigcols        Remove columns where one or more residues are ambiguity symbols
@@ -213,21 +214,20 @@ Combining multiple sequence files:
   --paste               Concatenate identically named sequences from separate input files.
                         Sequences are pasted end to end in the same order as the input
                         files. All input files must contain same number of sequences, and
-                        sequences in different files must have same name.(To see
-                        partitions choose nexus output, or output to multiple partition
-                        files).
+                        sequences in different files must have same name.(To see partitions
+                        choose nexus output, or output to multiple partition files).
   --overlap             Similar to --paste, but for input alignments that overlap partly.
                         Overlap is discovered automatically and partition boundaries are
                         then set such that each partition is covered by a unique set of
                         genes. (To see partitions choose nexus output, or output to
                         multiple partition files).
-  --minoverlap N        Minimum overlap required for merging input alignments (default:
-                        set automatically based on seq lengths)
+  --minoverlap N        Minimum overlap required for merging input alignments (default: set
+                        automatically based on seq lengths)
   --multifile           Outputs to multiple files (one per partition) instead of stdout.
                         Partitions are generated automatically based on other options.
-  --charset             Appends Nexus form charset block listing partitions in data
-                        (forces output in Nexus format). Charsets and partitions are
-                        generated automatically based on other options.
+  --charset             Appends Nexus form charset block listing partitions in data (forces
+                        output in Nexus format). Charsets and partitions are generated
+                        automatically based on other options.
   --mbpartblock         Appends MrBayes block with commands for running partitioned
                         analysis (forces output in Nexus format). Charsets and partitions
                         are generated automatically based on other options.
@@ -250,7 +250,7 @@ Summaries:
   --ignoregaps          When reporting composition: do not count gap symbols
   --nam                 Print names of sequences
   --div                 (For alignments) Print nucleotide diversity (=average pairwise
-                        sequence difference): mean and std
+                        sequence difference): mean, std, min, max
   --sit                 (For alignments) Print site summary: number of columns that are
                         variable (not conserved), number of columns that contain gaps, and
                         number of columns that contain IUPAC ambiguity symbols
