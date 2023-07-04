@@ -246,8 +246,9 @@ def build_parser():
                       + " mean, std, min, max")
 
     summaryg.add_argument("--sit", action="store_true", dest="s_sit",
-                      help="""(For alignments) Print site summary: number of columns that are variable (not conserved),
-                              number of columns that contain gaps, and number of columns that contain IUPAC ambiguity symbols""")
+                      help="""(For alignments) Print site summary: how many columns are variable, contain multiple residues,
+                              contain gaps, or contain IUPAC ambiguity symbols. Also keeps track of overlaps between
+                              these categories.""")
 
 
     #########################################################################################
