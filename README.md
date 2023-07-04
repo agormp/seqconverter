@@ -1,6 +1,6 @@
 # seqconverter
 
-![](https://img.shields.io/badge/version-2.9.2-blue)
+![](https://img.shields.io/badge/version-2.10.1-blue)
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, Stockholm, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
@@ -160,15 +160,16 @@ File formats:
 
 Retrieve subset of sequences:
   --subsample N         Randomly extract N sequences from sequence set
-  --select "REGEXP"     Select sequences where substring of name matches regular expression
+  --select "REGEXP"     Select sequences where substring of name matches regular
+                        expression
   --discard "REGEXP"    Discard sequences where substring of name matches regular
                         expression
   --subset NAMEFILE     Retrieve sequences listed in NAMEFILE
   --remseqs NAMEFILE    Discard sequences listed in NAMEFILE
   --filterpos VARIANT[,VARIANT,...]
                         Retrieve sequences containing specific residues on specific
-                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-separated
-                        list. Example: 484K,501Y
+                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-
+                        separated list. Example: 484K,501Y
   --filterdupseq        Remove duplicate sequences (keeping one of each); print names of
                         removed sequences on stderr.
   --filterdupname       Remove sequences with duplicate names (keeping one of each). If
@@ -214,20 +215,21 @@ Combining multiple sequence files:
   --paste               Concatenate identically named sequences from separate input files.
                         Sequences are pasted end to end in the same order as the input
                         files. All input files must contain same number of sequences, and
-                        sequences in different files must have same name.(To see partitions
-                        choose nexus output, or output to multiple partition files).
+                        sequences in different files must have same name.(To see
+                        partitions choose nexus output, or output to multiple partition
+                        files).
   --overlap             Similar to --paste, but for input alignments that overlap partly.
                         Overlap is discovered automatically and partition boundaries are
                         then set such that each partition is covered by a unique set of
                         genes. (To see partitions choose nexus output, or output to
                         multiple partition files).
-  --minoverlap N        Minimum overlap required for merging input alignments (default: set
-                        automatically based on seq lengths)
+  --minoverlap N        Minimum overlap required for merging input alignments (default:
+                        set automatically based on seq lengths)
   --multifile           Outputs to multiple files (one per partition) instead of stdout.
                         Partitions are generated automatically based on other options.
-  --charset             Appends Nexus form charset block listing partitions in data (forces
-                        output in Nexus format). Charsets and partitions are generated
-                        automatically based on other options.
+  --charset             Appends Nexus form charset block listing partitions in data
+                        (forces output in Nexus format). Charsets and partitions are
+                        generated automatically based on other options.
   --mbpartblock         Appends MrBayes block with commands for running partitioned
                         analysis (forces output in Nexus format). Charsets and partitions
                         are generated automatically based on other options.
@@ -251,9 +253,10 @@ Summaries:
   --nam                 Print names of sequences
   --div                 (For alignments) Print nucleotide diversity (=average pairwise
                         sequence difference): mean, std, min, max
-  --sit                 (For alignments) Print site summary: number of columns that are
-                        variable (not conserved), number of columns that contain gaps, and
-                        number of columns that contain IUPAC ambiguity symbols
+  --sit                 (For alignments) Print site summary: how many columns are
+                        variable, contain multiple residues, contain gaps, or contain
+                        IUPAC ambiguity symbols. Also keeps track of overlaps between
+                        these categories.
 ```
 
 
