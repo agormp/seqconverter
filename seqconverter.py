@@ -670,23 +670,66 @@ def print_summary(seqs, args):
         print(f"    Min:                {minpi:.5f}")
         print(f"    Max:                {maxpi:.5f}\n")
 
+    # if args.s_sit:
+    #     numvar = 0
+    #     numgap = 0
+    #     numambig = 0
+    #     for col in seqs.columns():
+    #         columnset = set(col)
+    #         if len(columnset) != 1:        # nvalues == 1 <=> conserved column
+    #             numvar += 1
+    #         if "-" in columnset:
+    #             numgap += 1
+    #         if (seqs.ambigsymbols & columnset):
+    #             numambig += 1
+    #     print("Site summary (note: variable, gappy, and ambiguous sites may overlap)")
+    #     print("    No. variable sites:  {:>6d}".format(numvar))
+    #     print("    No. gappy sites:     {:>6d}".format(numgap))
+    #     print("    No. ambiguous sites: {:>6d}\n".format(numambig))
+
     if args.s_sit:
         numvar = 0
+        nummulti = 0
         numgap = 0
         numambig = 0
+        numvar_only = 0
+        nummulti_gap = 0
+        nummulti_ambig = 0
+        nummulti_gap_ambig = 0
+        numgap_ambig = 0
+
+        ambigsymbols_set = set(seqs.ambigsymbols)
         for col in seqs.columns():
             columnset = set(col)
-            if len(columnset) != 1:        # nvalues == 1 <=> conserved column
+            if len(columnset) != 1:
                 numvar += 1
+                if "-" not in columnset and not (ambigsymbols_set & columnset):
+                    numvar_only += 1
+                if len(columnset - {"-", *ambigsymbols_set}) > 1:
+                    nummulti += 1
+                    if "-" in columnset:
+                        nummulti_gap += 1
+                        if ambigsymbols_set & columnset:
+                            nummulti_gap_ambig += 1
+                    if ambigsymbols_set & columnset:
+                        nummulti_ambig += 1
             if "-" in columnset:
                 numgap += 1
-            if (seqs.ambigsymbols & columnset):
+                if ambigsymbols_set & columnset:
+                    numgap_ambig += 1
+            if ambigsymbols_set & columnset:
                 numambig += 1
-        print("Site summary (note: variable, gappy, and ambiguous sites may overlap)")
-        print("    No. variable sites:  {:>6d}".format(numvar))
-        print("    No. gappy sites:     {:>6d}".format(numgap))
-        print("    No. ambiguous sites: {:>6d}\n".format(numambig))
 
+        print("Site summary")
+        print("    Variable sites:                      {:>6d}".format(numvar))
+        print("    Multi-residue sites:                 {:>6d}".format(nummulti))
+        print("    Gappy sites:                         {:>6d}".format(numgap))
+        print("    Ambiguous sites:                     {:>6d}".format(numambig))
+        print("    Multi-residue-only sites:            {:>6d}".format(numvar_only))
+        print("    Multi-residue gappy sites:           {:>6d}".format(nummulti_gap))
+        print("    Multi-residue ambiguous sites:       {:>6d}".format(nummulti_ambig))
+        print("    Multi-residue gappy-ambiguous sites: {:>6d}".format(nummulti_gap_ambig))
+        print("    Gappy-ambiguous sites:               {:>6d}\n".format(numgap_ambig))
 
     if args.s_com:
         compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
