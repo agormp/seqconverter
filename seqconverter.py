@@ -647,7 +647,7 @@ def print_summary(seqs, args):
         print()
 
     if args.s_num:
-        print("Number of sequences: {:10d}".format(len(seqs)))
+        print("Number of sequences: {:10d}\n".format(len(seqs)))
 
     if args.s_len:
         if not args.aligned:
@@ -670,23 +670,6 @@ def print_summary(seqs, args):
         print(f"    Standard dev:       {std:.5f}".format())
         print(f"    Min:                {minpi:.5f}")
         print(f"    Max:                {maxpi:.5f}\n")
-
-    # if args.s_sit:
-    #     numvar = 0
-    #     numgap = 0
-    #     numambig = 0
-    #     for col in seqs.columns():
-    #         columnset = set(col)
-    #         if len(columnset) != 1:        # nvalues == 1 <=> conserved column
-    #             numvar += 1
-    #         if "-" in columnset:
-    #             numgap += 1
-    #         if (seqs.ambigsymbols & columnset):
-    #             numambig += 1
-    #     print("Site summary (note: variable, gappy, and ambiguous sites may overlap)")
-    #     print("    No. variable sites:  {:>6d}".format(numvar))
-    #     print("    No. gappy sites:     {:>6d}".format(numgap))
-    #     print("    No. ambiguous sites: {:>6d}\n".format(numambig))
 
     if args.s_sit:
         numvar = 0
@@ -726,6 +709,7 @@ def print_summary(seqs, args):
         print("    Multi-residue sites:                 {:>6d}".format(nummulti))
         print("    Gappy sites:                         {:>6d}".format(numgap))
         print("    Ambiguous sites:                     {:>6d}".format(numambig))
+        print("\n")
         print("    Multi-residue-only sites:            {:>6d}".format(numvar_only))
         print("    Multi-residue gappy sites:           {:>6d}".format(nummulti_gap))
         print("    Multi-residue ambiguous sites:       {:>6d}".format(nummulti_ambig))
