@@ -135,13 +135,14 @@ usage: seqconverter [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--subsample N]
                     [--filterdupseq] [--filterdupname] [--subseq START,STOP]
                     [--subseqrename] [--windows WSIZE] [--degap] [--remcols INDEX-LIST]
                     [--remambigcols] [--remgapcols] [--remallgapcols]
-                    [--remfracgapcols FRAC] [--remconscols] [--remhmminsertcols]
-                    [--rename OLD,NEW] [--renamenumber BASENAME] [--appendnumber]
-                    [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
-                    [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]] [--paste]
-                    [--overlap] [--minoverlap N] [--multifile] [--charset] [--mbpartblock]
-                    [--revcomp] [--translate] [--num] [--len] [--com] [--seqcom]
-                    [--ignoregaps] [--nam] [--div] [--sit] [--debug]
+                    [--remfracgapcols FRAC] [--remendgapcols FRAC] [--remconscols]
+                    [--remhmminsertcols] [--rename OLD,NEW] [--renamenumber BASENAME]
+                    [--appendnumber] [--renameregexp "REGEXP"] [--regdupfix]
+                    [--savenames FILE] [--restorenames FILE]
+                    [--gbname FIELD1[,FIELD2,FIELD3,...]] [--paste] [--overlap]
+                    [--minoverlap N] [--multifile] [--charset] [--mbpartblock] [--revcomp]
+                    [--translate] [--num] [--len] [--com] [--seqcom] [--ignoregaps]
+                    [--nam] [--div] [--sit] [--debug]
                     [SEQFILE ...]
 
 positional arguments:
@@ -190,6 +191,7 @@ Extracting or removing parts of sequences:
   --remallgapcols       Remove columns that are all-gaps
   --remfracgapcols FRAC
                         Remove columns that contain > FRAC fraction gaps
+  --remendgapcols FRAC  Remove columns where > FRAC fraction have endgaps
   --remconscols         Remove conserved columns from alignment
   --remhmminsertcols    When reading Stockholm format file from HMMer's hmmalign: remove
                         columns corresponding to insert states
