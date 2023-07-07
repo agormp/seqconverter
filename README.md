@@ -131,18 +131,17 @@ seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 ```
 usage: seqconverter [-h] [-I FORMAT] [-O FORMAT] [--width WIDTH] [--subsample N]
                     [--select "REGEXP"] [--discard "REGEXP"] [--subset NAMEFILE]
-                    [--remseqs NAMEFILE] [--filterpos VARIANT[,VARIANT,...]]
-                    [--filterdupseq] [--filterdupname] [--subseq START,STOP]
+                    [--remseqs NAMEFILE] [--filterpos VARIANT[,VARIANT,...]] [--filterdupseq]
+                    [--filterdupname] [--remendgapseqs N] [--subseq START,STOP]
                     [--subseqrename] [--windows WSIZE] [--degap] [--remcols INDEX-LIST]
-                    [--remambigcols] [--remgapcols] [--remallgapcols]
-                    [--remfracgapcols FRAC] [--remendgapcols FRAC] [--remconscols]
-                    [--remhmminsertcols] [--rename OLD,NEW] [--renamenumber BASENAME]
-                    [--appendnumber] [--renameregexp "REGEXP"] [--regdupfix]
-                    [--savenames FILE] [--restorenames FILE]
-                    [--gbname FIELD1[,FIELD2,FIELD3,...]] [--paste] [--overlap]
-                    [--minoverlap N] [--multifile] [--charset] [--mbpartblock] [--revcomp]
-                    [--translate] [--num] [--len] [--com] [--seqcom] [--ignoregaps]
-                    [--nam] [--div] [--sit] [--debug]
+                    [--remambigcols] [--remgapcols] [--remallgapcols] [--remfracgapcols FRAC]
+                    [--remendgapcols FRAC] [--remconscols] [--remhmminsertcols]
+                    [--rename OLD,NEW] [--renamenumber BASENAME] [--appendnumber]
+                    [--renameregexp "REGEXP"] [--regdupfix] [--savenames FILE]
+                    [--restorenames FILE] [--gbname FIELD1[,FIELD2,FIELD3,...]] [--paste]
+                    [--overlap] [--minoverlap N] [--multifile] [--charset] [--mbpartblock]
+                    [--revcomp] [--translate] [--num] [--len] [--com] [--seqcom]
+                    [--ignoregaps] [--nam] [--div] [--sit] [--debug]
                     [SEQFILE ...]
 
 positional arguments:
@@ -155,27 +154,25 @@ options:
 File formats:
   -I FORMAT             Input format: auto, fasta, nexus, phylip, clustal, stockholm,
                         genbank, tab, raw, how [default: auto]
-  -O FORMAT             Output format: fasta, nexus, nexusgap, phylip, clustal, tab, raw,
-                        how [default: fasta]
+  -O FORMAT             Output format: fasta, nexus, nexusgap, phylip, clustal, tab, raw, how
+                        [default: fasta]
   --width WIDTH         Print sequences with WIDTH characters per line [default: 60]
 
 Retrieve subset of sequences:
   --subsample N         Randomly extract N sequences from sequence set
-  --select "REGEXP"     Select sequences where substring of name matches regular
-                        expression
-  --discard "REGEXP"    Discard sequences where substring of name matches regular
-                        expression
+  --select "REGEXP"     Select sequences where substring of name matches regular expression
+  --discard "REGEXP"    Discard sequences where substring of name matches regular expression
   --subset NAMEFILE     Retrieve sequences listed in NAMEFILE
   --remseqs NAMEFILE    Discard sequences listed in NAMEFILE
   --filterpos VARIANT[,VARIANT,...]
                         Retrieve sequences containing specific residues on specific
-                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-
-                        separated list. Example: 484K,501Y
+                        positions. Syntax is: <POS><RESIDUE>, possibly in a comma-separated
+                        list. Example: 484K,501Y
   --filterdupseq        Remove duplicate sequences (keeping one of each); print names of
                         removed sequences on stderr.
-  --filterdupname       Remove sequences with duplicate names (keeping one of each). If
-                        this option is not set (default): stop execution on duplicate
-                        names.
+  --filterdupname       Remove sequences with duplicate names (keeping one of each). If this
+                        option is not set (default): stop execution on duplicate names.
+  --remendgapseqs N     Discard sequences with endgaps longer than N positions
 
 Extracting or removing parts of sequences:
   --subseq START,STOP   Extract subsequence, positions START to STOP, from alignment
@@ -215,26 +212,25 @@ Renaming sequences:
 
 Combining multiple sequence files:
   --paste               Concatenate identically named sequences from separate input files.
-                        Sequences are pasted end to end in the same order as the input
-                        files. All input files must contain same number of sequences, and
-                        sequences in different files must have same name.(To see
-                        partitions choose nexus output, or output to multiple partition
-                        files).
+                        Sequences are pasted end to end in the same order as the input files.
+                        All input files must contain same number of sequences, and sequences
+                        in different files must have same name.(To see partitions choose
+                        nexus output, or output to multiple partition files).
   --overlap             Similar to --paste, but for input alignments that overlap partly.
-                        Overlap is discovered automatically and partition boundaries are
-                        then set such that each partition is covered by a unique set of
-                        genes. (To see partitions choose nexus output, or output to
-                        multiple partition files).
-  --minoverlap N        Minimum overlap required for merging input alignments (default:
-                        set automatically based on seq lengths)
+                        Overlap is discovered automatically and partition boundaries are then
+                        set such that each partition is covered by a unique set of genes. (To
+                        see partitions choose nexus output, or output to multiple partition
+                        files).
+  --minoverlap N        Minimum overlap required for merging input alignments (default: set
+                        automatically based on seq lengths)
   --multifile           Outputs to multiple files (one per partition) instead of stdout.
                         Partitions are generated automatically based on other options.
-  --charset             Appends Nexus form charset block listing partitions in data
+  --charset             Appends Nexus form charset block listing partitions in data (forces
+                        output in Nexus format). Charsets and partitions are generated
+                        automatically based on other options.
+  --mbpartblock         Appends MrBayes block with commands for running partitioned analysis
                         (forces output in Nexus format). Charsets and partitions are
                         generated automatically based on other options.
-  --mbpartblock         Appends MrBayes block with commands for running partitioned
-                        analysis (forces output in Nexus format). Charsets and partitions
-                        are generated automatically based on other options.
 
 DNA manipulations:
   --revcomp             Return reverse complement of sequence(s). Requires sequences to be
@@ -255,10 +251,9 @@ Summaries:
   --nam                 Print names of sequences
   --div                 (For alignments) Print nucleotide diversity (=average pairwise
                         sequence difference): mean, std, min, max
-  --sit                 (For alignments) Print site summary: how many columns are
-                        variable, contain multiple residues, contain gaps, or contain
-                        IUPAC ambiguity symbols. Also keeps track of overlaps between
-                        these categories.
+  --sit                 (For alignments) Print site summary: how many columns are variable,
+                        contain multiple residues, contain gaps, or contain IUPAC ambiguity
+                        symbols. Also keeps track of overlaps between these categories.
 ```
 
 
