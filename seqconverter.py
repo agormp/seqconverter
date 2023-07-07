@@ -709,7 +709,7 @@ def print_summary(seqs, args):
         print("    Multi-residue sites:                 {:>6d}".format(nummulti))
         print("    Gappy sites:                         {:>6d}".format(numgap))
         print("    Ambiguous sites:                     {:>6d}".format(numambig))
-        print("\n")
+        print("")
         print("    Multi-residue-only sites:            {:>6d}".format(numvar_only))
         print("    Multi-residue gappy sites:           {:>6d}".format(nummulti_gap))
         print("    Multi-residue ambiguous sites:       {:>6d}".format(nummulti_ambig))
