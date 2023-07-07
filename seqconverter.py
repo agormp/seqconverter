@@ -143,6 +143,9 @@ def build_parser():
     seqpartg.add_argument("--remfracgapcols", action="store", type=float, dest="frac", metavar="FRAC",
                         help="Remove columns that contain > FRAC fraction gaps")
 
+    seqpartg.add_argument("--remendgapcols", action="store", type=float, dest="endgapfrac", metavar="FRAC",
+                        help="Remove columns where > FRAC fraction have endgaps")
+
     seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
                           help="Remove conserved columns from alignment")
 
@@ -440,6 +443,8 @@ def check_args_alignment_issues(args):
             bad_options_list.append("--remallgapcols")
         if args.frac:
             bad_options_list.append("--remfracgapcols")
+        if args.endgapfrac:
+            bad_options_list.append("--remendgapcols")
         if args.remconscols:
             bad_options_list.append("--remconscols")
         if args.remhmminsertcols:
@@ -583,6 +588,10 @@ def change_seqs(seqs, args):
     # Removal of columns with > FRAC fraction gaps
     if args.frac is not None:
         seqs.remfracgapcol(args.frac)
+
+    # Removal of columns with > FRAC fraction endgaps
+    if args.endgapfrac is not None:
+        seqs.remendgapcol(args.endgapfrac)
 
     # Removal of conserved columns
     if args.remconscols:
