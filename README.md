@@ -1,7 +1,7 @@
 # seqconverter
 
 ![](https://img.shields.io/badge/version-2.12.1-blue)
-[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=downloads&service=github)](https://pepy.tech/project/seqconverter)
+[![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=PyPI%20downloads&service=github)](https://pepy.tech/project/seqconverter)
 
 The command-line program `seqconverter` can read and write text files containing aligned or unaligned DNA or protein sequences. The program understands most standard and some non-standard formats (fasta, Nexus, Phylip, Clustal, Stockholm, tab, raw, Genbank, How). The program can perform various manipulations on the sequences.
 
