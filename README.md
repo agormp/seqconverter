@@ -73,7 +73,7 @@ seqconverter -h
 
 Note: output is written to the terminal so you need to use redirection to store in a file.
 
-```bash
+```
 seqconverter -I fasta -O nexus --width 70 myalignment.fasta > myalignment.nexus
 ```
 
@@ -98,7 +98,7 @@ seqconverter -I fasta -O fasta --discard "seq_1[0-9]+" myseqs.fasta > subset.fas
 ### Select random subset of 50 sequences from input file
 
 ```
-seqconverter -I fasta -O fasta --subsample 50 myseqs.aln > subset.fasta
+seqconverter -I fasta -O fasta --subsample 50 myseqs.fasta > subset.fasta
 ```
 
 ----
@@ -136,7 +136,7 @@ seqconverter -I fasta -O fasta --remgapcols myalignment.fasta > gapfree.fasta
 This command will remove alignment columns if more than 75% of sequences have endgaps in that position. An endgap is defined as a contiguous gappy region at either the beginning or end of a sequence, and are often a result of missing data (the gaps then do not represent insertion or deletion events).
 
 ```
-seqconverter -I fasta -O fasta --remendgapcols 0.75 myalignment.fasta > gapfree.fasta
+seqconverter -I fasta -O fasta --remendgapcols 0.75 myalignment.fasta > endgapfree.fasta
 ```
 
 ----
@@ -160,7 +160,8 @@ This command concatenates identically named sequences from separate input alignm
 This can be used for phylogenetic analyses in BEAST or MrBayes where different genomic regions (e.g., genes) have different substitution models. Note: sequences in each file need to have identical names (e.g. name of species).
 
 ```
-seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+seqconverter -I fasta -O nexus --paste --charset \
+                               gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
 ```
 
 ----
@@ -170,7 +171,8 @@ seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 This command does the same as the example above, and additionally adds a MrBayes block containing commands to run a partitioned analysis. The commands have sensible default values (e.g., setting DNA substution models to "nst=mixed" and unlinking most parameters across partitions). Optimally the commands should be tweaked according to the concrete data set. Importing the Nexus file in BEAUTI should result in setting most corresponding options for a BEAST run (but check, and remember to set priors etc.)
 
 ```
-seqconverter -I fasta -O nexus --paste --charset --mbpartblock gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+seqconverter -I fasta -O nexus --paste --charset --mbpartblock \
+                               gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
 ```
 
 
