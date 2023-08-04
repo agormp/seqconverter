@@ -49,7 +49,7 @@ seqconverter relies on the [sequencelib library](https://github.com/agormp/seque
 * Extract all overlapping windows of specified size
 * Options to rename one or more sequences based on various criteria
 * Options to merge identically named sequences from multiple sequence files (end-to-end or discarding automatically discovered overlaps)
-* Options to automatically create Nexus charset commands based on merging multiple individual files (e.g., one file per gene).
+* Options to automatically create Nexus charset commands based on merging multiple individual files (e.g., one charset/partition per gene).
 * Can automatically write MrBayes block with template for commands to run partitioned analysis, also based on merging multiple separate sequence alignments.
 * Can translate and find reverse complement for DNA sequences
 * Options to obtain summary information about sequences and alignments: number of seqs, names, lengths, composition (overall or per sequence), nucleotide diversity (pi), site summary (how many columns are variable, contain multiple residues, contain gaps, or contain IUPAC ambiguity symbols)
@@ -57,74 +57,120 @@ seqconverter relies on the [sequencelib library](https://github.com/agormp/seque
 * Underlying library has been optimized for high speed and low memory consumption
 * Really has too many options, but does useful stuff (and has been created based on what I needed for own projects)
 
-## Usage examples
+## Quick start usage examples
 
-Get help:
+These examples highlight some of the options available. For the full list use option -h to get help.
+
+### Get help:
+
 ```
 seqconverter -h
 ```
 
-----------------------------------------------------------------
+----
 
-Convert aligned sequences in fasta format to nexus, write sequences using 70 characters per line (Note: output is written to the terminal so you need to use redirection to store in a file):
-```
+### Convert aligned sequences in fasta format to nexus, 70 characters per line
+
+Note: output is written to the terminal so you need to use redirection to store in a file.
+
+```bash
 seqconverter -I fasta -O nexus --width 70 myalignment.fasta > myalignment.nexus
 ```
 
-----------------------------------------------------------------
+----
 
-Extract columns 50-150 (inclusive, with numbering starting at 1) from alignment in Clustal format, write output in fasta format to file (using redirection):
-```
-seqconverter -I clustal -O fasta --subseq 50,150 myalignment.aln > aligment_50_150.fasta
-```
+### Select all sequences whose name match the regular expression "seq_1[0-9]+"
 
-----------------------------------------------------------------
-
-Select all sequences whose name match the regular expression "seq_1[0-9]+":
 ```
 seqconverter -I fasta -O fasta --select "seq_1[0-9]+" myseqs.fasta > subset.fasta
 ```
 
-----------------------------------------------------------------
+----
 
-Discard all sequences whose name match the regular expression "seq_1[0-9]+":
+### Discard all sequences whose name match the regular expression "seq_1[0-9]+":
+
 ```
 seqconverter -I fasta -O fasta --discard "seq_1[0-9]+" myseqs.fasta > subset.fasta
 ```
 
-----------------------------------------------------------------
+----
 
-Extract all sequences containing a Lysine at position 484 and a Tyrosine at position 501 from set of amino acid sequences:
+### Select random subset of 50 sequences from input file
+
+```
+seqconverter -I fasta -O fasta --subsample 50 myseqs.aln > subset.fasta
+```
+
+----
+
+### Select all sequences containing a Lysine at position 484 and a Tyrosine at position 501 
+
 ```
 seqconverter -I clustal -O fasta --filterpos 484K,501Y myalignment.aln > voc.fasta
 ```
 
-----------------------------------------------------------------
+----
 
-Remove columns where one or more residues are gaps from alignment:
+### Select columns 50-150 from ClustalW formatted alignment file, write output in fasta
+
+This command extracts columns 50-150 (inclusive, with numbering starting at 1) from alignment in Clustal format, and writes output in fasta format to file (using redirection):
+
+```
+seqconverter -I clustal -O fasta --subseq 50,150 myalignment.aln > aligment_50_150.fasta
+```
+
+----
+
+### Remove columns, where one or more residues are gaps, from alignment:
+
+This command will remove alignment columns if any sequence has a gap in that position.
+
 ```
 seqconverter -I fasta -O fasta --remgapcols myalignment.fasta > gapfree.fasta
 ```
 
-----------------------------------------------------------------
+----
 
-Remove those columns in input (which is in Stockholm format) that correspond to insert states from HMMer's hmmalign method (these will have "." for "gaps" and/or lowercase residue symbols):
-```
-seqconverter -I stockholm -O nexus --remhmminsertcols myalignment.sto > mainstates.nexus
-```
+### Remove columns, where more than 75% have endgaps, from alignment:
 
-----------------------------------------------------------------
+This command will remove alignment columns if more than 75% of sequences have endgaps in that position. An endgap is defined as a contiguous gappy region at either the beginning or end of a sequence, and are often a result of missing data (the gaps then do not represent insertion or deletion events).
 
-Concatenate identically named sequences from separate input files:
 ```
-seqconverter -I fasta -O fasta --paste alignm1.fasta alignm2.fasta alignm3.fasta > concat.fasta
+seqconverter -I fasta -O fasta --remendgapcols 0.75 myalignment.fasta > gapfree.fasta
 ```
 
-----------------------------------------------------------------
+----
 
-Concatenate identically named sequences from separate input files, creating partitioned Nexus file with `charset` specification. This can be used for phylogenetic analyses in BEAST or MrBayes where different genomic regions (e.g., genes) have different substitution models. Note: sequences in each file need to have identical names (e.g. name of species) and sequences in each file needs to be already aligned.
+### Concatenate identically named sequences from separate input files:
+
+Sequences are pasted end to end in the same order as the input files. All input files must contain same number of sequences, and sequences in different files must have same name (for instance each file could contain an alignment of the sequences for a specific gene from a number of different species, and each sequence could then have the name of the species). The order of sequences in different files does not matter.
+
+When used with the --charset (and possibly --mbblock) option this can be used to set up a partitioned analysis in MrBayes or BEAST (see below).
+
+```
+seqconverter -I fasta -O fasta --paste gene1.fasta gene2.fasta gene3.fasta > concat.fasta
+```
+
+----
+
+### Concatenate sequences from multiple files, create partitioned Nexus file containing charset command
+
+This command concatenates identically named sequences from separate input alignments, creating a partitioned Nexus file with `charset` specification. Start and stop indices for different charsets are automatically derived from lengths of sub-alignments. Charsets are named based on the names of included files.
+
+This can be used for phylogenetic analyses in BEAST or MrBayes where different genomic regions (e.g., genes) have different substitution models. Note: sequences in each file need to have identical names (e.g. name of species).
+
 ```
 seqconverter -I fasta -O nexus --paste --charset gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+```
+
+----
+
+### Concatenate sequences from multiple files, create partitioned Nexus file with commands to run MrBayes or BEAST analysis
+
+This command does the same as the example above, and additionally adds a MrBayes block containing commands to run a partitioned analysis. The commands have sensible default values (e.g., setting DNA substution models to "nst=mixed" and unlinking most parameters across partitions). Optimally the commands should be tweaked according to the concrete data set. Importing the Nexus file in BEAUTI should result in setting most corresponding options for a BEAST run (but check, and remember to set priors etc.)
+
+```
+seqconverter -I fasta -O nexus --paste --charset --mbpartblock gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
 ```
 
 
