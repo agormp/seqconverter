@@ -27,7 +27,7 @@ seqconverter relies on the [sequencelib library](https://github.com/agormp/seque
 
 ## Highlights
 
-* Can be used to convert between sequence file formats but also does other things
+* Can be used to convert between sequence file formats but also able to perform many other manipulations and analyses of sequences.
 * Read and write **aligned** sequences in the following formats:
 	* fasta
 	* Nexus
@@ -44,13 +44,15 @@ seqconverter relies on the [sequencelib library](https://github.com/agormp/seque
 	* How
 * Writes to stdout, so output can be used in pipes or redirected to file
 * Also accepts input on stdin
-* Extract subsequence (specified columns) from alignment
+* Options to select or discard sequences based on one of several criteria: name matches regular expression, name in NAMEFILE, sequence contains  specific residues on specific positions, duplicate (identical) sequences, duplicate names, sequence has many gaps at ends (<=> is shorter than other sequences), random sample of given size, ...
+* Options to select or remove columns from alignment based on one of several criteria: all gaps, some gaps, more than fraction gaps, more than fration endgaps, conserved, specified indices, ...
 * Extract all overlapping windows of specified size
-* Extract named sequences from set of sequences
-* Randomly sample from set of sequence
-* Remove columns from alignment based on one of several criteria (all gaps, some gaps, more than fraction gaps, conserved, specified indices, columns corresponding to insert states in output from HMMer's hmmalign method)
-* Rename sequences automatically or using file with pairs of "oldname newname"
-* Generate partitioned Nexus file with `charset` specification automatically from separate files containing identically named sequences (sequences are concatenated end to end in same order as files).
+* Options to rename one or more sequences based on various criteria
+* Options to merge identically named sequences from multiple sequence files (end-to-end or discarding automatically discovered overlaps)
+* Options to automatically create Nexus charset commands based on merging multiple individual files (e.g., one file per gene).
+* Can automatically write MrBayes block with template for commands to run partitioned analysis, also based on merging multiple separate sequence alignments.
+* Can translate and find reverse complement for DNA sequences
+* Options to obtain summary information about sequences and alignments: number of seqs, names, lengths, composition (overall or per sequence), nucleotide diversity (pi), site summary (how many columns are variable, contain multiple residues, contain gaps, or contain IUPAC ambiguity symbols)
 * More...
 * Underlying library has been optimized for high speed and low memory consumption
 * Really has too many options, but does useful stuff (and has been created based on what I needed for own projects)
