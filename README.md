@@ -145,7 +145,7 @@ seqconverter -I fasta -O fasta --remendgapcols 0.75 myalignment.fasta > endgapfr
 
 Sequences are pasted end to end in the same order as the input files. All input files must contain same number of sequences, and sequences in different files must have same name (for instance each file could contain an alignment of the sequences for a specific gene from a number of different species, and each sequence could then have the name of the species). The order of sequences in different files does not matter.
 
-When used with the --charset (and possibly --mbblock) option this can be used to set up a partitioned analysis in MrBayes or BEAST (see below).
+When used with the --charset (and possibly --mbpartblock) option this can be used to set up a partitioned analysis in MrBayes or BEAST (see below).
 
 ```
 seqconverter -I fasta -O fasta --paste gene1.fasta gene2.fasta gene3.fasta > concat.fasta
