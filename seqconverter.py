@@ -659,10 +659,8 @@ def change_seqs(seqs, args):
 def print_summary(seqs, args):
 
     if args.s_nam:
-        print("# Sequence names:")
         for name in sorted(seqs.seqnamelist):
             print(name)
-        print()
 
     if args.s_num:
         print("Number of sequences: {:10d}\n".format(len(seqs)))
@@ -740,19 +738,6 @@ def print_summary(seqs, args):
         print(f"    Multi-residue ambiguous sites:       {nummulti_ambig:>6,d}  {percentage(nummulti_ambig):>4.1f}%")
         print(f"    Multi-residue gappy-ambiguous sites: {nummulti_gap_ambig:>6,d}  {percentage(nummulti_gap_ambig):>4.1f}%")
         print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}  {percentage(numgap_ambig):>4.1f}%\n")
-
-        # print("Site summary")
-        # print(f"    Constant sites:                      {numconst:>6,d}")
-        # print(f"    Variable sites:                      {numvar:>6,d}")
-        # print(f"    Multi-residue sites:                 {nummulti:>6,d}")
-        # print(f"    Gappy sites:                         {numgap:>6,d}")
-        # print(f"    Ambiguous sites:                     {numambig:>6d}")
-        # print("")
-        # print(f"    Multi-residue-only sites:            {numvar_only:>6,d}")
-        # print(f"    Multi-residue gappy sites:           {nummulti_gap:>6,d}")
-        # print(f"    Multi-residue ambiguous sites:       {nummulti_ambig:>6,d}")
-        # print(f"    Multi-residue gappy-ambiguous sites: {nummulti_gap_ambig:>6,d}")
-        # print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}\n")
 
     if args.s_com:
         compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
