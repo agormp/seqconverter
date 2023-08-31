@@ -684,8 +684,8 @@ def print_summary(seqs, args):
     if args.s_div:
         avg, std, minpi, maxpi = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
         print("Nucleotide diversity pi (average pairwise sequence distance)")
-        print(f"    Mean:               {avg:.5f}".format())
-        print(f"    Standard dev:       {std:.5f}".format())
+        print(f"    Mean:               {avg:.5f}")
+        print(f"    Standard dev:       {std:.5f}")
         print(f"    Min:                {minpi:.5f}")
         print(f"    Max:                {maxpi:.5f}\n")
 
@@ -721,18 +721,38 @@ def print_summary(seqs, args):
                     numgap_ambig += 1
             if ambigsymbols_set & columnset:
                 numambig += 1
+        numconst = seqs.alignlen() - numvar
+
+        align_length = seqs.alignlen()
+
+        def percentage(num):
+            return (num / align_length) * 100
 
         print("Site summary")
-        print("    Variable sites:                      {:>6d}".format(numvar))
-        print("    Multi-residue sites:                 {:>6d}".format(nummulti))
-        print("    Gappy sites:                         {:>6d}".format(numgap))
-        print("    Ambiguous sites:                     {:>6d}".format(numambig))
+        print(f"    Constant sites:                      {numconst:>6,d}  {percentage(numconst):>4.1f}%")
+        print(f"    Variable sites:                      {numvar:>6,d}  {percentage(numvar):>4.1f}%")
+        print(f"    Multi-residue sites:                 {nummulti:>6,d}  {percentage(nummulti):>4.1f}%")
+        print(f"    Gappy sites:                         {numgap:>6,d}  {percentage(numgap):>4.1f}%")
+        print(f"    Ambiguous sites:                     {numambig:>6,d}  {percentage(numambig):>4.1f}%")
         print("")
-        print("    Multi-residue-only sites:            {:>6d}".format(numvar_only))
-        print("    Multi-residue gappy sites:           {:>6d}".format(nummulti_gap))
-        print("    Multi-residue ambiguous sites:       {:>6d}".format(nummulti_ambig))
-        print("    Multi-residue gappy-ambiguous sites: {:>6d}".format(nummulti_gap_ambig))
-        print("    Gappy-ambiguous sites:               {:>6d}\n".format(numgap_ambig))
+        print(f"    Multi-residue-only sites:            {numvar_only:>6,d}  {percentage(numvar_only):>4.1f}%")
+        print(f"    Multi-residue gappy sites:           {nummulti_gap:>6,d}  {percentage(nummulti_gap):>4.1f}%")
+        print(f"    Multi-residue ambiguous sites:       {nummulti_ambig:>6,d}  {percentage(nummulti_ambig):>4.1f}%")
+        print(f"    Multi-residue gappy-ambiguous sites: {nummulti_gap_ambig:>6,d}  {percentage(nummulti_gap_ambig):>4.1f}%")
+        print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}  {percentage(numgap_ambig):>4.1f}%\n")
+
+        # print("Site summary")
+        # print(f"    Constant sites:                      {numconst:>6,d}")
+        # print(f"    Variable sites:                      {numvar:>6,d}")
+        # print(f"    Multi-residue sites:                 {nummulti:>6,d}")
+        # print(f"    Gappy sites:                         {numgap:>6,d}")
+        # print(f"    Ambiguous sites:                     {numambig:>6d}")
+        # print("")
+        # print(f"    Multi-residue-only sites:            {numvar_only:>6,d}")
+        # print(f"    Multi-residue gappy sites:           {nummulti_gap:>6,d}")
+        # print(f"    Multi-residue ambiguous sites:       {nummulti_ambig:>6,d}")
+        # print(f"    Multi-residue gappy-ambiguous sites: {nummulti_gap_ambig:>6,d}")
+        # print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}\n")
 
     if args.s_com:
         compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
