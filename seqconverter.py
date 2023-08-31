@@ -14,7 +14,7 @@
 import sys
 import math
 import os.path
-import sequencelib as seqlib
+import sequencelib as sq
 import argparse
 import re
 
@@ -53,7 +53,7 @@ def main():
                     print("")
                     print(seqs.mbpartblock())
 
-    except seqlib.SeqError as exc:
+    except sq.SeqError as exc:
         if args.debug:
             import traceback
             traceback.print_exc(file=sys.stderr)
@@ -273,7 +273,7 @@ def build_parser():
 def check_commandline(args):
 
     if args.informat == "auto":
-        args.informat = "autodetect"         # Long name required by seqlib, short better for user interface...
+        args.informat = "autodetect"         # Long name required by sq, short better for user interface...
 
     # Set flags indicating whether input and/or output is aligned, and whether file should be read as alignment
     # Note: args that require manipulation of columns, and --paste also implies aligned sequences
@@ -295,51 +295,51 @@ def check_commandline(args):
         args.informat = "genbank"
 
     # Perform sanity checks on combination of args
-    # (Note: if autodetection of filetype is requested, then many checks are impossible - defer error checking to seqlib)
+    # (Note: if autodetection of filetype is requested, then many checks are impossible - defer error checking to sq)
 
     # Sanity check #1: option --degap cannot be used with any option that requires aligned sequences
     if args.degap and any([args.subseq, args.remambigcols, args.remgapcols, args.remallgapcols, args.remconscols,
                            args.frac, args.remhmminsertcols, args.mbpartblock, args.charset, args.multifile,
                            args.overlap, args.s_div, args.s_sit, args.paste]):
-        raise seqlib.SeqError("Option --degap cannot be used with any option that requires aligned sequences".format(args.outformat))
+        raise sq.SeqError("Option --degap cannot be used with any option that requires aligned sequences".format(args.outformat))
 
     # Sanity check #2: option --degap cannot be used if output is an alignment
     if args.degap and alignout:
-        raise seqlib.SeqError("Removal of all gap characters (--degap) not possible for output in {}".format(args.outformat))
+        raise sq.SeqError("Removal of all gap characters (--degap) not possible for output in {}".format(args.outformat))
 
     # Sanity check #3: option --subseq cannot be used together with args --remambigcols, --remgapcols, --remallgapcols or --remconscols
     if args.subseq and args.remambigcols:
-        raise seqlib.SeqError("Options --subseq and --remambigcols cannot be used simultaneously")
+        raise sq.SeqError("Options --subseq and --remambigcols cannot be used simultaneously")
     if args.subseq and args.remgapcols:
-        raise seqlib.SeqError("Options --subseq and --remgapcols cannot be used simultaneously")
+        raise sq.SeqError("Options --subseq and --remgapcols cannot be used simultaneously")
     if args.subseq and args.remallgapcols:
-        raise seqlib.SeqError("Options --subseq and --remallgapcols cannot be used simultaneously")
+        raise sq.SeqError("Options --subseq and --remallgapcols cannot be used simultaneously")
     if args.subseq and args.remconscols:
-        raise seqlib.SeqError("Options --subseq and --remconscols cannot be used simultaneously")
+        raise sq.SeqError("Options --subseq and --remconscols cannot be used simultaneously")
 
     # Sanity check #4: option --subseqrename can only be used in combination with --subseq
     if args.subseqrename and not args.subseq:
-        raise seqlib.SeqError("Option --subseqrename (add '_START_STOP' to seqnames) requires option --subseq")
+        raise sq.SeqError("Option --subseqrename (add '_START_STOP' to seqnames) requires option --subseq")
 
     # Sanity check #5: option --savenames requires option --renamenumber or --renameregexp
     if args.savenamefile and not (args.renamenumber or args.renameregexp):
-        raise seqlib.SeqError("Option --savenames requires option --renamenumber or --renameregexp")
+        raise sq.SeqError("Option --savenames requires option --renamenumber or --renameregexp")
 
     # Sanity check #6: args --renamenumber and --restorenames are incompatible
     if args.renamenumber and  args.restorenames:
-        raise seqlib.SeqError("Option --renamenumber and --restorenames cannot be used simultaneously")
+        raise sq.SeqError("Option --renamenumber and --restorenames cannot be used simultaneously")
 
     # Sanity check #7: args --renameregexp and --restorenames are incompatible
     if args.renameregexp and  args.restorenames:
-        raise seqlib.SeqError("Option --renameregexp and --restorenames cannot be used simultaneously")
+        raise sq.SeqError("Option --renameregexp and --restorenames cannot be used simultaneously")
 
     # Sanity check #8: args --renameregexp and --paste are incompatible
     if args.renameregexp and  args.paste:
-        raise seqlib.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
+        raise sq.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
 
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
-        raise seqlib.SeqError("Option --overlap requires multiple input files")
+        raise sq.SeqError("Option --overlap requires multiple input files")
 
     return (args)
 
@@ -349,18 +349,18 @@ def read_seqs(args):
 
     for filename in args.filelist:
         if filename != "-" and not os.path.isfile(filename):
-            raise seqlib.SeqError("File %s not found." % filename)
+            raise sq.SeqError("File %s not found." % filename)
 
     # Read sequences from all files
     seqlist = []          # List of either Seq_set or Seq_alignment objects
     for filename in args.filelist:
         if args.gbname:
-            seqfile = seqlib.Genbankfilehandle(filename, namefromfields=args.gbname)
+            seqfile = sq.Genbankfilehandle(filename, namefromfields=args.gbname)
         else:
-            seqfile = seqlib.Seqfile(filename, args.informat)
+            seqfile = sq.Seqfile(filename, args.informat)
 
         # If filetype was autodetected: check if this should be read as an alignment:
-        if args.informat == "autodetect" and isinstance(seqfile, seqlib.Alignfile_reader):
+        if args.informat == "autodetect" and isinstance(seqfile, sq.Alignfile_reader):
             args.aligned = True
 
         if args.aligned:
@@ -382,7 +382,7 @@ def read_seqs(args):
         if change_to_alignment:
             newseqlist = []
             for seqset in seqlist:
-                newseqset = seqlib.Seq_alignment()
+                newseqset = sq.Seq_alignment()
                 newseqset.addseqset(seqset)
                 newseqlist.append(newseqset)
             seqlist = newseqlist
@@ -399,7 +399,7 @@ def read_seqs(args):
             alignment_dict[alignment.name] = alignment
 
         # Find overlap between consensus sequences, get list of contigs
-        ra = seqlib.Read_assembler( consensus_list )
+        ra = sq.Read_assembler( consensus_list )
         contiglist = ra.assemble(minoverlap=args.minoverlap)
 
         # Build concatenated alignment from non-overlapping sub-alignments
@@ -413,7 +413,7 @@ def read_seqs(args):
                 new_name = ".".join(region.name_list)       # Set name of partition to collection of all seqs in this overlap (possibly only one)
                 subalignment.name = new_name
                 if seqs is None:
-                    seqs = seqlib.Seq_alignment(new_name)
+                    seqs = sq.Seq_alignment(new_name)
                     seqs.addseqset(subalignment)
                 else:
                     seqs.appendalignment(subalignment)
@@ -470,7 +470,7 @@ def check_args_alignment_issues(args):
             bad_options_list.append("--paste")
         if bad_options_list:
             bad_option_string = ", ".join(bad_options_list)
-            raise SeqError("The option(s) below require aligned sequences:\n\t{}".format(bad_option_string))
+            raise sq.SeqError("The option(s) below require aligned sequences:\n\t{}".format(bad_option_string))
 
 ################################################################################################
 
@@ -519,7 +519,7 @@ def change_seqs(seqs, args):
 
     # Extract sequences whose names match regexp in "select"
     if args.select:
-        newseqs = seqlib.Seq_set()
+        newseqs = sq.Seq_set()
         regexp = args.select
         for seq in seqs:
             if re.search(regexp, seq.name):
@@ -528,7 +528,7 @@ def change_seqs(seqs, args):
 
     # Discard sequences whose names match regexp in "discard"
     if args.discard:
-        newseqs = seqlib.Seq_set()
+        newseqs = sq.Seq_set()
         regexp = args.discard
         for seq in seqs:
             if not re.search(regexp, seq.name):
@@ -562,7 +562,7 @@ def change_seqs(seqs, args):
         # If sequences have been read as alignment: first convert to Seq_set:
         if args.aligned:
             args.aligned = False
-            newseqs = seqlib.Seq_set()
+            newseqs = sq.Seq_set()
             for seq in seqs:
                 newseqs.addseq(seq)
             seqs = newseqs
@@ -620,7 +620,7 @@ def change_seqs(seqs, args):
 
     # Extraction of sequence windows
     if args.wsize:
-        newseqs = seqlib.Seq_set()
+        newseqs = sq.Seq_set()
         for seq in seqs:
             for seqwin in seq.windows(args.wsize, rename=True):
                 newseqs.addseq(seqwin)
@@ -837,7 +837,7 @@ def write_partitions(seqs, args):
     for alignment in part_alignments:
         outname = "partition_{alname}.{suffix}".format(alname=alignment.name, suffix=args.outformat)
         if os.path.isfile(outname):
-            raise seqlib.SeqError("File with name {} already exists. Aborting to avoid overwriting.".format(outname))
+            raise sq.SeqError("File with name {} already exists. Aborting to avoid overwriting.".format(outname))
         fh = open(outname, "w")
         print_seqs(alignment, args, filehandle=fh)
         fh.close()
