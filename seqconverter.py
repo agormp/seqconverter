@@ -699,7 +699,9 @@ def print_summary(seqs, args):
         numgap_ambig = 0
 
         ambigsymbols_set = set(seqs.ambigsymbols)
+        sitepatterns = set()
         for col in seqs.columns():
+            sitepatterns.add(tuple(col))
             columnset = set(col)
             if len(columnset) != 1:
                 numvar += 1
@@ -737,7 +739,9 @@ def print_summary(seqs, args):
         print(f"    Multi-residue gappy sites:           {nummulti_gap:>6,d}  {percentage(nummulti_gap):>4.1f}%")
         print(f"    Multi-residue ambiguous sites:       {nummulti_ambig:>6,d}  {percentage(nummulti_ambig):>4.1f}%")
         print(f"    Multi-residue gappy-ambiguous sites: {nummulti_gap_ambig:>6,d}  {percentage(nummulti_gap_ambig):>4.1f}%")
-        print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}  {percentage(numgap_ambig):>4.1f}%\n")
+        print(f"    Gappy-ambiguous sites:               {numgap_ambig:>6,d}  {percentage(numgap_ambig):>4.1f}%")
+        print("")
+        print(f"    Number of unique site patterns:      {len(sitepatterns):>6,d}\n")
 
     if args.s_com:
         compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
