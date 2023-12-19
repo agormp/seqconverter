@@ -3,3 +3,4 @@ notes/
 tests/
 .DS_Store
 __pycache__
+seqconverter.egg-info
