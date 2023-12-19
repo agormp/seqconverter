@@ -30,7 +30,7 @@ def main():
         check_args_alignment_issues(args)
 
         if args.dupseqfilter:
-            seqs = filterdupseqs(seqs)
+            seqs.removedupseqs()
 
         if args.filterpos:
             seqs = positionfilter(seqs, args)
@@ -65,52 +65,53 @@ def main():
 def build_parser():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("filelist", nargs="*", metavar='SEQFILE', default="-", help="One or more sequence files")
-
     #########################################################################################
 
-    formatg = parser.add_argument_group("File formats")
+    fileg = parser.add_argument_group("Input/Output")
 
-    formatg.add_argument("-I", action='store', dest="informat", metavar="FORMAT", default="auto",
+    fileg.add_argument("-i", nargs="*", metavar='SEQFILE', default="-", dest="filelist",
+                       help="One or more sequence files")
+
+    fileg.add_argument("--informat", action='store', metavar="FORMAT", default="auto",
                       choices=["auto", "fasta", "nexus", "phylip", "clustal", "stockholm",
                                "genbank", "tab", "raw", "how"],
                       help="Input format: %(choices)s [default: %(default)s]")
 
-    formatg.add_argument("-O", action='store', dest="outformat", metavar="FORMAT", default="fasta",
+    fileg.add_argument("--outformat", action='store', metavar="FORMAT", default="fasta",
                       choices=["fasta", "nexus", "nexusgap", "phylip", "clustal", "tab", "raw", "how"],
                       help="Output format:  %(choices)s [default: %(default)s]")
 
-    formatg.add_argument("--width", action="store", type=int, dest="width", metavar="WIDTH", default=60,
+    fileg.add_argument("--width", action="store", type=int, dest="width", metavar="WIDTH", default=60,
                         help="Print sequences with WIDTH characters per line [default: %(default)s]")
 
     #########################################################################################
 
     subsetg = parser.add_argument_group("Retrieve subset of sequences")
 
-    subsetg.add_argument("--subsample", action="store", type=int, dest="samplesize", metavar="N",
-                        help="Randomly extract N sequences from sequence set")
+    subsetg.add_argument("--sampleseq", action="store", type=int, dest="samplesize", metavar="N",
+                        help="Randomly sample N sequences from sequence set")
 
-    subsetg.add_argument("--select", action="store", metavar='"REGEXP"',
+    subsetg.add_argument("--keepreg", action="store", metavar='"REGEXP"',
                           help="Select sequences where substring of name matches regular expression")
 
-    subsetg.add_argument("--discard", action="store", metavar='"REGEXP"',
+    subsetg.add_argument("--remreg", action="store", metavar='"REGEXP"',
                           help="Discard sequences where substring of name matches regular expression")
 
-    subsetg.add_argument("--subset", action="store", dest="namefile", metavar="NAMEFILE",
-                        help="Retrieve sequences listed in NAMEFILE")
+    subsetg.add_argument("--keepname", action="store", dest="namefile", metavar="NAMEFILE",
+                        help="Select sequences listed in NAMEFILE")
 
-    subsetg.add_argument("--remseqs", action="store", dest="remfile", metavar="NAMEFILE",
+    subsetg.add_argument("--remname", action="store", dest="remfile", metavar="NAMEFILE",
                         help="Discard sequences listed in NAMEFILE")
 
     subsetg.add_argument("--filterpos", action="store", dest="filterpos", metavar="VARIANT[,VARIANT,...]",
                           help="""Retrieve sequences containing specific residues on specific positions. Syntax is: <POS><RESIDUE>,
                           possibly in a comma-separated list. Example: 484K,501Y""")
 
-    subsetg.add_argument("--filterdupseq", action="store_true", dest="dupseqfilter",
-                          help="Remove duplicate sequences (keeping one of each); print names of removed sequences on stderr.")
+    subsetg.add_argument("--remdupseq", action="store_true", dest="dupseqfilter",
+                          help="Remove duplicate sequences (keeping one of each, randomly selected).")
 
-    subsetg.add_argument("--filterdupname", action="store_true", dest="dupnamefilter",
-                          help="Remove sequences with duplicate names (keeping one of each). If this option is not set (default): stop execution on duplicate names.")
+    subsetg.add_argument("--remdupname", action="store_true", dest="dupnamefilter",
+                          help="Remove sequences with duplicate names (keeping one of each, randomly selected). If this option is not set (default): stop execution on duplicate names.")
 
     subsetg.add_argument("--remendgapseqs", action="store", type=int, dest="endgapcutoff", metavar="N",
                         help="Discard sequences with endgaps longer than N positions")
@@ -119,11 +120,40 @@ def build_parser():
 
     seqpartg = parser.add_argument_group("Extracting or removing parts of sequences")
 
-    seqpartg.add_argument("--subseq", action="store", dest="subseq", metavar="START,STOP",
-                          help="Extract subsequence, positions START to STOP, from alignment")
+    seqpartg.add_argument("--samplecols", action="store", type=int, metavar="N",
+                        help="Randomly sample N columns from alignment")
 
-    seqpartg.add_argument("--subseqrename", action="store_true", dest="subseqrename",
-                          help="When extracting sub-sequences: add '_START_STOP' to seqnames")
+    seqpartg.add_argument("--keepcols", action="store", dest="keepcols", metavar="INDEXLIST",
+                          help="Keep listed columns in alignment. "
+                             + "Columns can be indicated as comma-separated list of indices, and as ranges. "
+                             + "Example: --keepcols 10,15,22-40,57")
+
+    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEXLIST",
+                          help="Remove listed columns from alignment. "
+                             + "Columns can be indicated as comma-separated list of indices, and as ranges. "
+                             + "Example: --remcols 10,15,22-40,57")
+
+    seqpartg.add_argument("--remgapcols", nargs='?', const=0.0, default=None,
+                          metavar="FRAC", action="store", type=float,
+                          help="Remove columns that contain any gaps. "
+                             + "If FRAC (number between 0-1) given: Remove columns "
+                             + "where the fraction of gaps >= FRAC.")
+
+    seqpartg.add_argument("--remambigcols", nargs='?', const=0.0, default=None,
+                          metavar="FRAC", action="store", type=float,
+                          help="Remove columns where one or more residues are ambiguity symbols "
+                             + "(e.g., N for nucleotides). "
+                             + "If FRAC (number between 0-1) given: Remove columns "
+                             + "where the fraction of ambiguity symbols >= FRAC.")
+
+    seqpartg.add_argument("--remendgapcols", nargs='?', const=0.0, default=None,
+                          metavar="FRAC", action="store", type=float, dest="endgapfrac",
+                          help="Remove columns where one or more sequences have endgaps. "
+                             + "If FRAC (number between 0-1) given: Remove columns "
+                             + "where the fraction of sequences having endgaps is >= FRAC.")
+
+    seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
+                          help="Remove conserved columns from alignment")
 
     seqpartg.add_argument("--windows", action="store", type=int, dest="wsize", metavar="WSIZE",
                           help="Extract all overlapping sequence windows of size WSIZE")
@@ -131,54 +161,28 @@ def build_parser():
     seqpartg.add_argument("--degap", action="store_true", dest="degap",
                           help="Remove all gap characters from sequences")
 
-    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEX-LIST",
-                          help="Remove listed columns from alignment. Columns can be indicated as comma-separated list of indices, and as ranges. Example: --remcols=10,15,22-40,57")
-
-    seqpartg.add_argument("--remambigcols", action="store_true", dest="remambigcols",
-                          help="Remove columns where one or more residues are ambiguity symbols (e.g., N for nucleotides)")
-
-    seqpartg.add_argument("--remgapcols", action="store_true", dest="remgapcols",
-                          help="Remove columns where one or more residues are gaps")
-
-    seqpartg.add_argument("--remallgapcols", action="store_true", dest="remallgapcols",
-                        help="Remove columns that are all-gaps")
-
-    seqpartg.add_argument("--remfracgapcols", action="store", type=float, dest="frac", metavar="FRAC",
-                        help="Remove columns that contain > FRAC fraction gaps")
-
-    seqpartg.add_argument("--remendgapcols", action="store", type=float, dest="endgapfrac", metavar="FRAC",
-                        help="Remove columns where > FRAC fraction have endgaps")
-
-    seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
-                          help="Remove conserved columns from alignment")
-
-    seqpartg.add_argument("--remhmminsertcols", action="store_true", dest="remhmminsertcols",
-                          help="When reading Stockholm format file from HMMer's hmmalign: remove columns corresponding to insert states")
-
     #########################################################################################
 
     renameg = parser.add_argument_group("Renaming sequences")
 
-    renameg.add_argument("--rename", action="store", dest="rename", metavar="OLD,NEW",
+    renameg.add_argument("--rename", nargs=2, metavar=('OLD', 'NEW'),
                           help="Rename single sequence from OLD to NEW")
 
-    renameg.add_argument("--renamenumber", action="store", dest="renamenumber", metavar="BASENAME",
+    renameg.add_argument("--renamenum", action="store", dest="renamenum", metavar="BASENAME",
                           help="Rename all sequences to this form: BASENAME_001, ...")
 
-    renameg.add_argument("--appendnumber", action="store_true", dest="appendnumber",
-                          help="Append numbering at end of existing sequence names (SeqA_001, SeqXYZ_002, ...")
+    renameg.add_argument("--renameregex",  nargs=2, metavar=('"OLD_REGEX"', '"NEW_STRING"'),
+                          help="Rename sequences: Replace occurrences of regular expression "
+                             + "OLD_REGEX with NEW_STRING")
 
-    renameg.add_argument("--renameregexp", action="store", dest="renameregexp", metavar='"REGEXP"',
-                          help="Rename sequences by deleting parts of names matching regular expression in REGEXP")
-
-    renameg.add_argument("--regdupfix", action="store_true", dest="fixdupnames",
-                        help="Fix duplicate names, created by regexp, by appending numbers to duplicates (seqA, seqA_2, ...)")
-
-    renameg.add_argument("--savenames", action="store", dest="savenamefile", metavar="FILE",
+    renameg.add_argument("--saverename", action="store", dest="savenamefile", metavar="FILE",
                           help="Save renaming information in FILE for later use")
 
-    renameg.add_argument("--restorenames", action="store", dest="restorenames", metavar="FILE",
-                          help="Restore original names using info previously saved in FILE")
+    renameg.add_argument("--renamefile", action="store", metavar="NAMEFILE",
+                          help="Replace names in sequence file using OLDNAME NEWNAME pairs "
+                             + "in NAMEFILE. Not all names need to be listed. "
+                             + "Note: can be used to restore names saved "
+                             + "with --saverename during previous renaming.")
 
     renameg.add_argument("--gbname", action="store", dest="gbname", metavar="FIELD1[,FIELD2,FIELD3,...]",
                         help="For Genbank input: construct sequence names from the list of named fields, in the specified order")
@@ -284,10 +288,8 @@ def check_commandline(args):
         alignin = True
     if any([args.outformat=="nexus", args.outformat=="nexusgap", args.outformat=="phylip", args.outformat=="clustal"]):
         alignout = True
-    if any([alignin, alignout, args.remcols, args.remambigcols, args.remgapcols, args.remallgapcols,
-            args.remconscols, args.remhmminsertcols, args.subseq, args.paste, args.overlap]):
-        args.aligned = True
-    if args.frac is not None:        # Note: value may be zero, and bool(0) = False!
+    if any([alignin, alignout, args.remcols, args.remambigcols, args.remgapcols,
+            args.remconscols, args.keepcols, args.paste, args.overlap]):
         args.aligned = True
 
     # If option --gbname is set: force input format to "genbank"
@@ -298,8 +300,8 @@ def check_commandline(args):
     # (Note: if autodetection of filetype is requested, then many checks are impossible - defer error checking to sq)
 
     # Sanity check #1: option --degap cannot be used with any option that requires aligned sequences
-    if args.degap and any([args.subseq, args.remambigcols, args.remgapcols, args.remallgapcols, args.remconscols,
-                           args.frac, args.remhmminsertcols, args.mbpartblock, args.charset, args.multifile,
+    if args.degap and any([args.keepcols, args.remambigcols, args.remgapcols, args.remconscols,
+                           args.mbpartblock, args.charset, args.multifile,
                            args.overlap, args.s_div, args.s_sit, args.paste]):
         raise sq.SeqError("Option --degap cannot be used with any option that requires aligned sequences".format(args.outformat))
 
@@ -307,35 +309,29 @@ def check_commandline(args):
     if args.degap and alignout:
         raise sq.SeqError("Removal of all gap characters (--degap) not possible for output in {}".format(args.outformat))
 
-    # Sanity check #3: option --subseq cannot be used together with args --remambigcols, --remgapcols, --remallgapcols or --remconscols
-    if args.subseq and args.remambigcols:
-        raise sq.SeqError("Options --subseq and --remambigcols cannot be used simultaneously")
-    if args.subseq and args.remgapcols:
-        raise sq.SeqError("Options --subseq and --remgapcols cannot be used simultaneously")
-    if args.subseq and args.remallgapcols:
-        raise sq.SeqError("Options --subseq and --remallgapcols cannot be used simultaneously")
-    if args.subseq and args.remconscols:
-        raise sq.SeqError("Options --subseq and --remconscols cannot be used simultaneously")
+    # Sanity check #3: option --keepcols cannot be used together with args --remambigcols, --remgapcols, or --remconscols
+    if args.keepcols and args.remambigcols:
+        raise sq.SeqError("Options --keepcols and --remambigcols cannot be used simultaneously")
+    if args.keepcols and args.remgapcols:
+        raise sq.SeqError("Options --keepcols and --remgapcols cannot be used simultaneously")
+    if args.keepcols and args.remconscols:
+        raise sq.SeqError("Options --keepcols and --remconscols cannot be used simultaneously")
 
-    # Sanity check #4: option --subseqrename can only be used in combination with --subseq
-    if args.subseqrename and not args.subseq:
-        raise sq.SeqError("Option --subseqrename (add '_START_STOP' to seqnames) requires option --subseq")
+    # Sanity check #5: option --saverename requires option --renamenum or --renameregex
+    if args.savenamefile and not (args.renamenum or args.renameregex):
+        raise sq.SeqError("Option --saverename requires option --renamenum or --renameregex")
 
-    # Sanity check #5: option --savenames requires option --renamenumber or --renameregexp
-    if args.savenamefile and not (args.renamenumber or args.renameregexp):
-        raise sq.SeqError("Option --savenames requires option --renamenumber or --renameregexp")
+    # Sanity check #6: args --renamenum and --renamefile are incompatible
+    if args.renamenum and  args.renamefile:
+        raise sq.SeqError("Option --renamenum and --renamefile cannot be used simultaneously")
 
-    # Sanity check #6: args --renamenumber and --restorenames are incompatible
-    if args.renamenumber and  args.restorenames:
-        raise sq.SeqError("Option --renamenumber and --restorenames cannot be used simultaneously")
+    # Sanity check #7: args --renameregex and --renamefile are incompatible
+    if args.renameregex and  args.renamefile:
+        raise sq.SeqError("Option --renameregex and --renamefile cannot be used simultaneously")
 
-    # Sanity check #7: args --renameregexp and --restorenames are incompatible
-    if args.renameregexp and  args.restorenames:
-        raise sq.SeqError("Option --renameregexp and --restorenames cannot be used simultaneously")
-
-    # Sanity check #8: args --renameregexp and --paste are incompatible
-    if args.renameregexp and  args.paste:
-        raise sq.SeqError("Option --renameregexp and --paste cannot be used simultaneously: first rename, then paste resulting files")
+    # Sanity check #8: args --renameregex and --paste are incompatible
+    if args.renameregex and  args.paste:
+        raise sq.SeqError("Option --renameregex and --paste cannot be used simultaneously: first rename, then paste resulting files")
 
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
@@ -436,24 +432,18 @@ def check_args_alignment_issues(args):
     # Check if any requested option clashes with alignment status
     if not args.aligned:
         bad_options_list = []
-        if args.subseq:
-            bad_options_list.append("--subseq")
+        if args.keepcols:
+            bad_options_list.append("--keepcols")
         if args.endgapcutoff:
             bad_options_list.append("--remendgapseqs")
         if args.remambigcols:
             bad_options_list.append("--remambigcols")
         if args.remgapcols:
             bad_options_list.append("--remgapcols")
-        if args.remallgapcols:
-            bad_options_list.append("--remallgapcols")
-        if args.frac:
-            bad_options_list.append("--remfracgapcols")
         if args.endgapfrac:
             bad_options_list.append("--remendgapcols")
         if args.remconscols:
             bad_options_list.append("--remconscols")
-        if args.remhmminsertcols:
-            bad_options_list.append("--remhmminsertcols")
         if args.mbpartblock:
             bad_options_list.append("--mbpartblock")
         if args.charset:
@@ -474,15 +464,23 @@ def check_args_alignment_issues(args):
 
 ################################################################################################
 
-def filterdupseqs(seqs):
-    simlist = seqs.removedupseqs()
-    if simlist:
-        sys.stderr.write("Lists of identical sequences:\n")
-        for namelist in simlist:
-            sys.stderr.write(" ".join(namelist))
-            sys.stderr.write("\n")
+def parse_indexlist(seqs, indexlist_string):
+    """Parse INDEX-LIST string, create list of all individual positions implied by syntax
+    Note: input assumed to be 1-indexed, output is 0-indexed ("slicesyntax")
+    Example: input: 1-5,10,15-18, output: [0,1,2,3,4,9,14,15,16,17]"""
 
-    return(seqs)
+    poslist = []
+    items = indexlist_string.split(",")
+    for item in items:
+       if "-" in item:
+           (start,stop) = item.split("-")
+           start = int(start) - 1       # Slice syntax: Numbering starts at 0
+           stop = int(stop)             # Slice syntax: stop is one more than last index (=> do not subtract 1 from non-slice syntax)
+           poslist.extend(list(range(start,stop)))
+       else:
+           poslist.append(int(item) - 1)
+
+    return poslist
 
 ################################################################################################
 
@@ -517,19 +515,19 @@ def change_seqs(seqs, args):
     if args.samplesize:
         seqs = seqs.subsample(args.samplesize)
 
-    # Extract sequences whose names match regexp in "select"
-    if args.select:
+    # Extract sequences whose names match regexp in "keepreg"
+    if args.keepreg:
         newseqs = sq.Seq_set()
-        regexp = args.select
+        regexp = args.keepreg
         for seq in seqs:
             if re.search(regexp, seq.name):
                 newseqs.addseq(seq)
         seqs = newseqs
 
-    # Discard sequences whose names match regexp in "discard"
-    if args.discard:
+    # Discard sequences whose names match regexp in "remreg"
+    if args.remreg:
         newseqs = sq.Seq_set()
-        regexp = args.discard
+        regexp = args.remreg
         for seq in seqs:
             if not re.search(regexp, seq.name):
                 newseqs.addseq(seq)
@@ -568,35 +566,33 @@ def change_seqs(seqs, args):
             seqs = newseqs
         seqs.remgaps()
 
+    # Random sampling of columns
+    if args.samplecols:
+        seqs.samplecols(args.samplecols)
+
     # Removal of listed columns
     if args.remcols:
-        remlist = []
-        items = args.remcols.split(",")
-        for item in items:
-            if "-" in item:
-                (start,stop) = item.split("-")
-                start = int(start) - 1          # Slice syntax: Numbering starts at 0
-                stop = int(stop)                # Slice syntax: stop is one more than last index (=> do not need to subtract 1 from non-slice syntax)
-                remlist.extend(list(range(start,stop)))
-            else:
-                remlist.append(int(item) - 1)
+        remlist = parse_indexlist(seqs, args.remcols)
         seqs.remcols(remlist)
 
+    # Extraction of listed columns
+    if args.keepcols:
+        keeplist = parse_indexlist(seqs, args.keepcols)
+        seqs.indexfilter(keeplist)
+
     # Removal of ambiguity columns
-    if args.remambigcols:
-        seqs.remambigcol()
+    if args.remambigcols is not None:
+        if args.remambigcols == 0.0:
+            seqs.remambigcol()
+        else:
+            seqs.remfracambigcol(args.remambigcols)
 
     # Removal of gappy columns
-    if args.remgapcols:
-        seqs.remgapcol()
-
-    # Removal of all-gap columns
-    if args.remallgapcols:
-        seqs.remallgapcol()
-
-    # Removal of columns with > FRAC fraction gaps
-    if args.frac is not None:
-        seqs.remfracgapcol(args.frac)
+    if args.remgapcols is not None:
+        if args.remgapcols == 0.0:
+            seqs.remgapcol()
+        else:
+            seqs.remfracgapcol(args.remgapcols)
 
     # Removal of columns with > FRAC fraction endgaps
     if args.endgapfrac is not None:
@@ -605,18 +601,6 @@ def change_seqs(seqs, args):
     # Removal of conserved columns
     if args.remconscols:
         seqs.remconscol()
-
-    # Removal of insert state columns (in output from HMMer's hmmalign)
-    if args.remhmminsertcols:
-        seqs.rem_hmmalign_insertcol()
-
-    # Extraction of subsequence
-    # Note: it is assumed that indexing starts at 1, and that stop is included ("slicesyntax=False")
-    if args.subseq:
-        (start, stop) = args.subseq.split(",")
-        start = int(start)
-        stop = int(stop)
-        seqs = seqs.subseq(start, stop, slicesyntax=False, rename=args.subseqrename)
 
     # Extraction of sequence windows
     if args.wsize:
@@ -630,17 +614,15 @@ def change_seqs(seqs, args):
     if args.rename:
         (oldname, newname) = args.rename.split(",")
         seqs.changeseqname(oldname, newname)
-    elif args.renamenumber:
-        seqs.rename_numbered(args.renamenumber, args.savenamefile)
-    elif args.renameregexp:
-        seqs.rename_regexp(args.renameregexp, args.savenamefile, args.dupnamefilter, args.fixdupnames)
-    # Note: option appendnumber is not under "else" clause: In principle it can be combined with previous renaming!
-    if args.appendnumber:
-        seqs.appendnumber(args.savenamefile)
+    elif args.renamenum:
+        seqs.rename_numbered(args.renamenum, args.savenamefile)
+    elif args.renameregex:
+        old_regex, new_string = args.renameregex
+        seqs.rename_regexp(old_regex, new_string, args.savenamefile)
 
     # Restore names
-    if args.restorenames:
-        seqs.transname(args.restorenames)
+    if args.renamefile:
+        seqs.transname(args.renamefile)
 
 
     # Translation
