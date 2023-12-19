@@ -205,7 +205,7 @@ def build_parser():
                           help="Similar to --paste, but for input alignments that overlap partly. " +
                           "Overlap is discovered automatically and partition boundaries are then set " +
                           "such that each partition is covered by a unique set of genes. " +
-                          "(To see partitions choose nexus output, or output to multiple partition files)." +
+                          "(To see partitions choose nexus output, or output to multiple partition files). " +
                           "MIN: (optional) minimum overlap required for merging input alignments " +
                           "(default: set automatically based on seq lengths)")
 
