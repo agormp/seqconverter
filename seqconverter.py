@@ -17,6 +17,7 @@ import os.path
 import sequencelib as sq
 import argparse
 import re
+from pathlib import Path
 
 ################################################################################################
 
@@ -69,8 +70,10 @@ def build_parser():
 
     fileg = parser.add_argument_group("Input/Output")
 
-    fileg.add_argument("-i", nargs="*", metavar='SEQFILE', default="-", dest="filelist",
-                       help="One or more sequence files")
+    fileg.add_argument("-i", action="append", dest="filelist", metavar='SEQFILE',
+                       default=None, type=Path,
+                       help="One or more sequence files (repeat -i SEQFILE option for " +
+                        "each input file)")
 
     fileg.add_argument("--informat", action='store', metavar="FORMAT", default="auto",
                       choices=["auto", "fasta", "nexus", "phylip", "clustal", "stockholm",
@@ -276,6 +279,9 @@ def build_parser():
 
 def check_commandline(args):
 
+    if args.filelist is None:
+        args.filelist = ["-"]
+
     if args.informat == "auto":
         args.informat = "autodetect"         # Long name required by sq, short better for user interface...
 
@@ -419,7 +425,7 @@ def read_seqs(args):
         seqs = seqlist[0]
         for seqset in seqlist[1:]:
             if args.paste:
-                seqs.appendalignment(seqset)
+                seqs = seqs.appendalignment(seqset)
             else:
                 seqs.addseqset(seqset, args.dupnamefilter)
 
