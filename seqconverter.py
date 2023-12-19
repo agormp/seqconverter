@@ -201,14 +201,13 @@ def build_parser():
                           "in different files must have same name." +
                           "(To see partitions choose nexus output, or output to multiple partition files).")
 
-    multifileg.add_argument("--overlap", action="store_true", dest="overlap",
+    multifileg.add_argument("--overlap", nargs='?', const=0, type=int, default=None, metavar="MIN",
                           help="Similar to --paste, but for input alignments that overlap partly. " +
                           "Overlap is discovered automatically and partition boundaries are then set " +
                           "such that each partition is covered by a unique set of genes. " +
-                          "(To see partitions choose nexus output, or output to multiple partition files).")
-
-    multifileg.add_argument("--minoverlap", action="store", type=int, dest="minoverlap", metavar="N", default=-1,
-                        help="Minimum overlap required for merging input alignments (default: set automatically based on seq lengths)")
+                          "(To see partitions choose nexus output, or output to multiple partition files)." +
+                          "MIN: (optional) minimum overlap required for merging input alignments " +
+                          "(default: set automatically based on seq lengths)")
 
     multifileg.add_argument("--multifile", action="store_true", dest="multifile",
                         help="Outputs to multiple files (one per partition) instead of stdout. " +
@@ -402,7 +401,7 @@ def read_seqs(args):
 
         # Find overlap between consensus sequences, get list of contigs
         ra = sq.Read_assembler( consensus_list )
-        contiglist = ra.assemble(minoverlap=args.minoverlap)
+        contiglist = ra.assemble(minoverlap=args.overlap)
 
         # Build concatenated alignment from non-overlapping sub-alignments
         # Order and coordinates for each subalignment is based on info about regions in each contig from contiglist
