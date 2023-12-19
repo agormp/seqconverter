@@ -41,7 +41,7 @@ def main():
         if args.multifile:
             write_partitions(seqs, args)
         else:
-            if any([args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_seqcom, args.s_sit]):
+            if any([args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_comseq, args.s_sit]):
                 print_summary(seqs, args)
             else:
                 print_seqs(seqs, args)
@@ -235,6 +235,9 @@ def build_parser():
 
     summaryg = parser.add_argument_group("Summaries", description="No sequences are printed when these options are used")
 
+    summaryg.add_argument("--nam", action="store_true", dest="s_nam",
+                      help="Print names of sequences")
+
     summaryg.add_argument("--num", action="store_true", dest="s_num",
                       help="Print number of sequences")
 
@@ -244,18 +247,15 @@ def build_parser():
     summaryg.add_argument("--com", action="store_true", dest="s_com",
                       help="Print overall sequence composition")
 
-    summaryg.add_argument("--seqcom", action="store_true", dest="s_seqcom",
+    summaryg.add_argument("--comseq", action="store_true", dest="s_comseq",
                       help="Print composition for each individual sequence. Output is one line per residue-type per sequence: seqname, residue-type, freq, count, seqlength")
-
-    summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
-                      help="When reporting composition: do not count gap symbols")
-
-    summaryg.add_argument("--nam", action="store_true", dest="s_nam",
-                      help="Print names of sequences")
 
     summaryg.add_argument("--div", action="store_true", dest="s_div",
                       help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference):"
                       + " mean, std, min, max")
+
+    summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
+                      help="When computing composition or diversity: do not count gap symbols")
 
     summaryg.add_argument("--sit", action="store_true", dest="s_sit",
                       help="""(For alignments) Print site summary: how many columns are variable, contain multiple residues,
@@ -417,7 +417,7 @@ def read_seqs(args):
                     seqs = sq.Seq_alignment(new_name)
                     seqs.addseqset(subalignment)
                 else:
-                    seqs.appendalignment(subalignment)
+                    seqs = seqs.appendalignment(subalignment)
 
     # For other options than overlap: Collect sequences in one sequence collection object
     else:
@@ -751,7 +751,7 @@ def print_summary(seqs, args):
             print("    {:^7s}{:>8.3f}{:>10d} / {}".format(res, freq, count, tot_count))
         print()
 
-    if args.s_seqcom:
+    if args.s_comseq:
         longestname = max(seqs.getnames(), key=len)
         maxlenname = max(len(longestname), len("name"))
         print("{name:<{nl}s}{res:^8s}{f:>8s}{n:>10s}{l:>10s}".format(name="name", nl=maxlenname+2,
