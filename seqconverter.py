@@ -117,8 +117,8 @@ def build_parser():
     subsetg.add_argument("--remdupname", action="store_true", dest="dupnamefilter",
                           help="Remove sequences with duplicate names (keeping one of each, randomly selected). If this option is not set (default): stop execution on duplicate names.")
 
-    subsetg.add_argument("--remendgapseqs", action="store", type=int, dest="endgapcutoff", metavar="N",
-                        help="Discard sequences with endgaps longer than N positions")
+    subsetg.add_argument("--remendgapseqs", action="store", type=int, metavar="MIN",
+                        help="Discard sequences with endgaps >= MIN positions")
 
     #########################################################################################
 
@@ -440,7 +440,7 @@ def check_args_alignment_issues(args):
         bad_options_list = []
         if args.keepcols:
             bad_options_list.append("--keepcols")
-        if args.endgapcutoff:
+        if args.remendgapseqs:
             bad_options_list.append("--remendgapseqs")
         if args.remambigcols:
             bad_options_list.append("--remambigcols")
@@ -557,9 +557,9 @@ def change_seqs(seqs, args):
         namef.close()
         seqs.remseqs(namelist)
 
-    # Remove sequences with endgaps longer than args.endgapcutoff positions
-    if args.endgapcutoff is not None:
-        seqs.remendgapseqs(args.endgapcutoff)
+    # Remove sequences with endgaps longer than args.remendgapseqs positions
+    if args.remendgapseqs is not None:
+        seqs.remendgapseqs(args.remendgapseqs)
 
     # Removal of gaps from individual sequences
     if args.degap:
