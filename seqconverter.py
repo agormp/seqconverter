@@ -90,7 +90,7 @@ def build_parser():
 
     #########################################################################################
 
-    subsetg = parser.add_argument_group("Retrieve subset of sequences")
+    subsetg = parser.add_argument_group("Select subset of sequences")
 
     subsetg.add_argument("--sampleseq", action="store", type=int, dest="samplesize", metavar="N",
                         help="Randomly sample N sequences from sequence set")
@@ -122,7 +122,7 @@ def build_parser():
 
     #########################################################################################
 
-    seqpartg = parser.add_argument_group("Extracting or removing parts of sequences")
+    seqpartg = parser.add_argument_group("Select subset of positions in sequences")
 
     seqpartg.add_argument("--samplecols", action="store", type=int, metavar="N",
                         help="Randomly sample N columns from alignment")
