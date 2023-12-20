@@ -73,7 +73,8 @@ def build_parser():
     fileg.add_argument("-i", action="append", dest="filelist", metavar='SEQFILE',
                        default=None, type=Path,
                        help="One or more sequence files (repeat -i SEQFILE option for " +
-                        "each input file)")
+                        "each input file). If -i SEQFILE is not given: take input from stdin "
+                        +"(typically from a UNIX pipe).")
 
     fileg.add_argument("--informat", action='store', metavar="FORMAT", default="auto",
                       choices=["auto", "fasta", "nexus", "phylip", "clustal", "stockholm",
