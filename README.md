@@ -9,6 +9,10 @@ The command-line program `seqconverter` can read and write text files containing
 
 The seqconverter source code is available on GitHub: https://github.com/agormp/seqconverter. The executable can be installed from PyPI: https://pypi.org/project/seqconverter/
 
+## Latest Release
+
+Version 3.0.0 has recently been released, and contains a number of changes to the user-interface. For a full overview see notes in the latest release.
+
 ## Installation
 
 ```
@@ -20,6 +24,9 @@ Upgrading to latest version:
 ```
 python3 -m pip install --upgrade seqconverter
 ```
+## Citation
+
+To cite seqconverter: use the link in the right sidebar under About --> Cite this repository.
 
 ## Dependencies
 
