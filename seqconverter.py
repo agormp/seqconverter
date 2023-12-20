@@ -133,10 +133,11 @@ def build_parser():
                              + "or a range (e.g., 20-37). Multiple values shold be separated by "
                              + "blanks. Example: --keepcols 10 15 22-40 57")
 
-    seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEXLIST",
-                          help="Remove listed columns from alignment. "
-                             + "Columns can be indicated as comma-separated list of indices, and as ranges. "
-                             + "Example: --remcols 10,15,22-40,57")
+    seqpartg.add_argument("--remcols", nargs='+', type=str, metavar="INDEX_OR_RANGE",
+                          help="Remove alignment columns indicated by one or more INDEX_OR_RANGE values. "
+                             + "INDEX_OR_RANGE values are either a single position (e.g., 15) "
+                             + "or a range (e.g., 20-37). Multiple values shold be separated by "
+                             + "blanks. Example: --remcols 10 15 22-40 57")
 
     seqpartg.add_argument("--remgapcols", nargs='?', const=0.0, default=None,
                           metavar="FRAC", action="store", type=float,
