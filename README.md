@@ -84,7 +84,7 @@ seqconverter --informat fasta --outformat nexus \
 ```
 
 Note 1: output is written to the terminal so you need to use redirection to store in a file.
-Note 2: input format will be automatically detected if not specified with --informat (works well for standard file types)
+Note 2: input format will be automatically detected if not specified with --informat (this works well for standard file types)
 
 
 ----
@@ -92,7 +92,8 @@ Note 2: input format will be automatically detected if not specified with --info
 ### Select all sequences whose name match the regular expression "seq_1[0-9]+"
 
 ```
-seqconverter --informat fasta --outformat fasta --keepreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
+seqconverter --informat fasta --outformat fasta \
+             --keepreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
 ```
 Note: default output format is fasta, so you do not need to specify --outformat fasta
 
@@ -101,7 +102,8 @@ Note: default output format is fasta, so you do not need to specify --outformat 
 ### Discard all sequences whose name match the regular expression "seq_1[0-9]+":
 
 ```
-seqconverter --informat fasta --outformat fasta --remreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
+seqconverter --informat fasta --outformat fasta \
+             --remreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
 ```
 
 ----
@@ -109,7 +111,8 @@ seqconverter --informat fasta --outformat fasta --remreg "seq_1[0-9]+" myseqs.fa
 ### Select random subset of 50 sequences from input file
 
 ```
-seqconverter --informat fasta --outformat fasta --sampleseq 50 myseqs.fasta > subset.fasta
+seqconverter --informat fasta --outformat fasta \
+             --sampleseq 50 myseqs.fasta > subset.fasta
 ```
 
 ----
@@ -117,7 +120,8 @@ seqconverter --informat fasta --outformat fasta --sampleseq 50 myseqs.fasta > su
 ### Select all sequence variants containing a Lysine at position 484 and a Tyrosine at position 501 
 
 ```
-seqconverter --informat clustal --outformat fasta --keepvar 484K 501Y myalignment.aln > voc.fasta
+seqconverter --informat clustal --outformat fasta \
+             --keepvar 484K 501Y myalignment.aln > voc.fasta
 ```
 
 ----
@@ -125,7 +129,8 @@ seqconverter --informat clustal --outformat fasta --keepvar 484K 501Y myalignmen
 ### Select columns 50-150 from ClustalW formatted alignment file, write output in fasta
 
 ```
-seqconverter --informat clustal --outformat fasta --keepcols 50-150 myalignment.aln > aligment_50_150.fasta
+seqconverter --informat clustal --outformat fasta \
+             --keepcols 50-150 myalignment.aln > aligment_50_150.fasta
 ```
 
 ----
@@ -133,7 +138,8 @@ seqconverter --informat clustal --outformat fasta --keepcols 50-150 myalignment.
 ### Remove columns, where one or more residues are gaps, from alignment:
 
 ```
-seqconverter --informat fasta --outformat fasta --remgapcols myalignment.fasta > gapfree.fasta
+seqconverter --informat fasta --outformat fasta \
+             --remgapcols myalignment.fasta > gapfree.fasta
 ```
 
 ----
@@ -141,7 +147,8 @@ seqconverter --informat fasta --outformat fasta --remgapcols myalignment.fasta >
 ### Remove columns, where >= 75% are gaps, from alignment:
 
 ```
-seqconverter --informat fasta --outformat fasta --remgapcols 0.75 myalignment.fasta > fewergaps.fasta
+seqconverter --informat fasta --outformat fasta \
+             --remgapcols 0.75 myalignment.fasta > fewergaps.fasta
 ```
 
 ----
@@ -151,7 +158,8 @@ seqconverter --informat fasta --outformat fasta --remgapcols 0.75 myalignment.fa
 This command will remove alignment columns if more than 75% of sequences have endgaps in that position. An endgap is defined as a contiguous gappy region at either the beginning or end of a sequence, and are often a result of missing data (the gaps then do not represent insertion or deletion events).
 
 ```
-seqconverter --informat fasta --outformat fasta --remendgapcols 0.75 myalignment.fasta > fewer_endgaps.fasta
+seqconverter --informat fasta --outformat fasta \
+             --remendgapcols 0.75 myalignment.fasta > fewer_endgaps.fasta
 ```
 
 ----
@@ -163,7 +171,8 @@ Sequences are pasted end to end in the same order as the order of the input file
 When used with the --charset (and possibly --mb) option this can be used to set up a partitioned analysis in MrBayes or BEAST (see below).
 
 ```
-seqconverter --informat fasta --outformat fasta --paste gene1.fasta gene2.fasta gene3.fasta > concat.fasta
+seqconverter --informat fasta --outformat fasta \
+             --paste gene1.fasta gene2.fasta gene3.fasta > concat.fasta
 ```
 
 ----
@@ -175,7 +184,8 @@ This command concatenates identically named sequences from separate input alignm
 This can be used for phylogenetic analyses in BEAST or MrBayes where different genomic regions (e.g., genes) have different substitution models. Note: sequences in each file need to have identical names (e.g. name of species).
 
 ```
-seqconverter --outformat nexus --paste --charset gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+seqconverter --outformat nexus --paste \
+             --charset gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
 ```
 
 ----
@@ -185,7 +195,8 @@ seqconverter --outformat nexus --paste --charset gene1.fasta gene2.fasta gene3.f
 This command does the same as the example above, and additionally adds a MrBayes block containing commands to run a partitioned analysis. The commands have sensible default values (e.g., setting DNA substution models to "nst=mixed" and unlinking most parameters across partitions). Optimally the commands should be tweaked according to the concrete data set. Importing the Nexus file in BEAUTI should result in setting most corresponding options for a BEAST run (but check, and remember to set priors etc.)
 
 ```
-seqconverter --outformat nexus --paste --charset --mb gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+seqconverter --outformat nexus --paste \
+             --charset --mb gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
 ```
 
 
