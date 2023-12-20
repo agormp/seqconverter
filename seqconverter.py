@@ -240,8 +240,13 @@ def build_parser():
     dnag.add_argument("--revcomp", action="store_true", dest="revcomp",
                       help="Return reverse complement of sequence(s). Requires sequences to be DNA.")
 
-    dnag.add_argument("--translate", action="store_true", dest="translate",
-                      help="Translate DNA into amino acid sequences (requires sequences to be DNA, in frame, and length multiple of 3)")
+    dnag.add_argument("--translate", type=int, default=None, metavar="READING_FRAME",
+                      choices = [1,2,3], dest="reading_frame",
+                      help="Translate input DNA sequences into amino acid sequences. "
+                         + "READING_FRAME: either 1, 2, or 3, where 1 means start translation "
+                         + "from first nucleotide in sequences. Translation includes as "
+                         + "many full-length codons as possible, given READING_FRAME.")
+
 
     #########################################################################################
 
@@ -641,8 +646,8 @@ def change_seqs(seqs, args):
 
 
     # Translation
-    if args.translate:
-        seqs = seqs.translate()
+    if args.reading_frame:
+        seqs = seqs.translate(args.reading_frame)
 
     # Reverse complement
     if args.revcomp:
