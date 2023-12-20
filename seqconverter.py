@@ -167,7 +167,8 @@ def build_parser():
                           help="Remove conserved columns from alignment")
 
     seqpartg.add_argument("--windows", action="store", type=int, dest="wsize", metavar="WSIZE",
-                          help="Extract all overlapping sequence windows of size WSIZE")
+                          help="For each sequence in input: extract all overlapping sequence windows "
+                             + "of size WSIZE")
 
     seqpartg.add_argument("--degap", action="store_true", dest="degap",
                           help="Remove all gap characters from sequences")
@@ -186,8 +187,8 @@ def build_parser():
                           help="Rename sequences: Replace occurrences of regular expression "
                              + "OLD_REGEX with NEW_STRING")
 
-    renameg.add_argument("--saverename", action="store", dest="savenamefile", metavar="FILE",
-                          help="Save renaming information in FILE for later use")
+    renameg.add_argument("--saverename", action="store", dest="savenamefile", metavar="NAMEFILE",
+                          help="Save renaming information in NAMEFILE for later use")
 
     renameg.add_argument("--renamefile", action="store", metavar="NAMEFILE",
                           help="Replace names in sequence file using OLDNAME NEWNAME pairs "
@@ -204,17 +205,20 @@ def build_parser():
 
     multifileg.add_argument("--paste", action="store_true", dest="paste",
                           help="Concatenate identically named sequences from separate input files. " +
-                          "Sequences are pasted end to end in the same order as the input files. " +
+                          "Sequences are pasted end to end in the same order as the order of the input files. " +
                           "All input files must contain same number of sequences, and sequences " +
-                          "in different files must have same name." +
-                          "(To see partitions choose nexus output, or output to multiple partition files).")
+                          "in different files must have same name. (Order of sequences in individual " +
+                          "file is not important)." +
+                          "To see partitions choose nexus output, or output to multiple partition files.")
 
     multifileg.add_argument("--overlap", nargs='?', const=0, type=int, default=None, metavar="MIN",
-                          help="Similar to --paste, but for input alignments that overlap partly. " +
-                          "Overlap is discovered automatically and partition boundaries are then set " +
+                          help="Similar to --paste, but for input alignments that overlap partly at their " +
+                          "ends. " +
+                          "End-overlaps are discovered automatically and partition boundaries are then set " +
                           "such that each partition is covered by a unique set of genes. " +
-                          "(To see partitions choose nexus output, or output to multiple partition files). " +
-                          "MIN: (optional) minimum overlap required for merging input alignments " +
+                          "To see partitions choose nexus output, or output to multiple partition files. " +
+                          "MIN: (optional, integer) minimum number of overlapping residues required for " +
+                          "merging input alignments " +
                           "(default: set automatically based on seq lengths)")
 
     multifileg.add_argument("--multifile", action="store_true", dest="multifile",
@@ -225,7 +229,7 @@ def build_parser():
                         help="Appends Nexus form charset block listing partitions in data (forces output in Nexus format). " +
                           "Charsets and partitions are generated automatically based on other options.")
 
-    multifileg.add_argument("--mbpartblock", action="store_true", dest="mbpartblock",
+    multifileg.add_argument("--mb", action="store_true", dest="mbpartblock",
                         help="Appends MrBayes block with commands for running partitioned analysis (forces output in Nexus format). " +
                           "Charsets and partitions are generated automatically based on other options.")
 
