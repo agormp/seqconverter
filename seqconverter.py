@@ -183,7 +183,7 @@ def build_parser():
     renameg.add_argument("--renamenum", action="store", dest="renamenum", metavar="BASENAME",
                           help="Rename all sequences to this form: BASENAME_001, ...")
 
-    renameg.add_argument("--renameregex",  nargs=2, metavar=('"OLD_REGEX"', '"NEW_STRING"'),
+    renameg.add_argument("--renamereg",  nargs=2, metavar=('"OLD_REGEX"', '"NEW_STRING"'),
                           help="Rename sequences: Replace occurrences of regular expression "
                              + "OLD_REGEX with NEW_STRING")
 
