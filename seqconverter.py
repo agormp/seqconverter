@@ -82,7 +82,7 @@ def build_parser():
                       help="Input format: %(choices)s [default: %(default)s]")
 
     fileg.add_argument("--outformat", action='store', metavar="FORMAT", default="fasta",
-                      choices=["fasta", "nexus", "nexusgap", "phylip", "clustal", "tab", "raw", "how"],
+                      choices=["fasta", "nexus", "phylip", "clustal", "tab", "raw", "how"],
                       help="Output format:  %(choices)s [default: %(default)s]")
 
     fileg.add_argument("--width", action="store", type=int, dest="width", metavar="WIDTH", default=60,
@@ -292,7 +292,7 @@ def check_commandline(args):
     alignin = alignout = args.aligned = False
     if any([args.informat=="nexus", args.informat=="phylip", args.informat=="clustal", args.informat=="stockholm"]):
         alignin = True
-    if any([args.outformat=="nexus", args.outformat=="nexusgap", args.outformat=="phylip", args.outformat=="clustal"]):
+    if any([args.outformat=="nexus", args.outformat=="phylip", args.outformat=="clustal"]):
         alignout = True
     if any([alignin, alignout, args.remcols, args.remambigcols, args.remgapcols,
             args.remconscols, args.keepcols, args.paste, args.overlap]):
@@ -800,8 +800,6 @@ def print_seqs(seqs, args, filehandle=sys.stdout):
         else:
             parts = False
         filehandle.write(seqs.nexus(print_partitioned = parts, width = args.width) + '\n')
-    elif args.outformat == "nexusgap":
-        filehandle.write(seqs.nexusgap(width = args.width) + '\n')
     elif args.outformat == "phylip":
         filehandle.write(seqs.phylip(width = args.width) + '\n')
     elif args.outformat == "clustal":
