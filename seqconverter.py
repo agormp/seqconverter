@@ -261,6 +261,11 @@ def build_parser():
     summaryg.add_argument("--len", action="store_true", dest="s_len",
                       help="Print summary of sequence lengths")
 
+    summaryg.add_argument("--sit", action="store_true", dest="s_sit",
+                      help="""(For alignments) Print site summary: how many columns are variable, contain multiple residues,
+                              contain gaps, or contain IUPAC ambiguity symbols. Also keeps track of overlaps between
+                              these categories, and the number of unique site patterns (columns)""")
+
     summaryg.add_argument("--com", action="store_true", dest="s_com",
                       help="Print overall sequence composition")
 
@@ -273,12 +278,6 @@ def build_parser():
 
     summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
                       help="When computing composition or diversity: do not count gap symbols")
-
-    summaryg.add_argument("--sit", action="store_true", dest="s_sit",
-                      help="""(For alignments) Print site summary: how many columns are variable, contain multiple residues,
-                              contain gaps, or contain IUPAC ambiguity symbols. Also keeps track of overlaps between
-                              these categories.""")
-
 
     #########################################################################################
 
