@@ -80,7 +80,7 @@ seqconverter -h
 
 ```
 seqconverter --informat fasta --outformat nexus \
-			 --width 70 myalignment.fasta > myalignment.nexus
+             --width 70 myalignment.fasta > myalignment.nexus
 ```
 
 Note 1: output is written to the terminal so you need to use redirection to store in a file.
