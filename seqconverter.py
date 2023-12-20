@@ -121,7 +121,8 @@ def build_parser():
                           help="Remove sequences with duplicate names (keeping one of each, randomly selected). If this option is not set (default): stop execution on duplicate names.")
 
     subsetg.add_argument("--remendgapseqs", action="store", type=int, metavar="MIN",
-                        help="Discard sequences with endgaps >= MIN positions")
+                        help="Discard sequences with endgaps >= MIN positions "
+                            + "Endgaps are defined as contiguous block of gap symbols at either end of sequence.")
 
     #########################################################################################
 
@@ -159,7 +160,8 @@ def build_parser():
                           metavar="FRAC", action="store", type=float, dest="endgapfrac",
                           help="Remove columns where one or more sequences have endgaps. "
                              + "If FRAC (number between 0-1) given: Remove columns "
-                             + "where the fraction of sequences having endgaps is >= FRAC.")
+                             + "where the fraction of sequences having endgaps is >= FRAC. "
+                             + "Endgaps are defined as contiguous block of gap symbols at either end of sequence")
 
     seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
                           help="Remove conserved columns from alignment")
