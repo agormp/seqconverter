@@ -79,7 +79,8 @@ seqconverter -h
 ### Convert aligned sequences in fasta format to nexus, 70 characters per line
 
 ```
-seqconverter --informat fasta --outformat nexus --width 70 myalignment.fasta > myalignment.nexus
+seqconverter --informat fasta --outformat nexus \
+			 --width 70 myalignment.fasta > myalignment.nexus
 ```
 
 Note 1: output is written to the terminal so you need to use redirection to store in a file.
