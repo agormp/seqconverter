@@ -33,7 +33,7 @@ def main():
         if args.dupseqfilter:
             seqs.removedupseqs()
 
-        if args.filterpos:
+        if args.keepvar:
             seqs = positionfilter(seqs, args)
 
         seqs = change_seqs(seqs, args)
@@ -107,9 +107,12 @@ def build_parser():
     subsetg.add_argument("--remname", action="store", dest="remfile", metavar="NAMEFILE",
                         help="Discard sequences listed in NAMEFILE")
 
-    subsetg.add_argument("--filterpos", action="store", dest="filterpos", metavar="VARIANT[,VARIANT,...]",
-                          help="""Retrieve sequences containing specific residues on specific positions. Syntax is: <POS><RESIDUE>,
-                          possibly in a comma-separated list. Example: 484K,501Y""")
+    subsetg.add_argument("--keepvar", nargs='+', type=str, metavar="VARIANT",
+                          help="Select sequences containing specific variants, i.e., specific "
+                              + "residues on specific positions. "
+                              + "Syntax for specifying VARIANT is: <POS><RESIDUE> (e.g., 484K). "
+                              + "Multiple variants can be specifyed simultaneously separated "
+                              + "by blanks. Example: --keepvar 484K 501Y")
 
     subsetg.add_argument("--remdupseq", action="store_true", dest="dupseqfilter",
                           help="Remove duplicate sequences (keeping one of each, randomly selected).")
@@ -493,11 +496,10 @@ def parse_indexlist(seqs, indexlist):
 
 def positionfilter(seqs, args):
 
-    # Extract positions and residues from input of the form: 484K,501Y,987W.
+    # Extract positions and residues from input of the form: ["484K", "501Y", "987W"].
     # Save as list of (pos, residue) tuples
     varlist = []
-    items = args.filterpos.split(",")
-    for item in items:
+    for item in args.keepvar:
         residue = item[-1]
         pos = int(item[:-1]) - 1     # Convert to python array numbering from natural numbering
         varlist.append( (pos, residue) )
