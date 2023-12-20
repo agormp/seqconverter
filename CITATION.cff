@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "seqconverter: a command-line program for reading, writing, analyzing, and manipulating sequence files"
+version: 3.0.0
+date-released: 2023-12-20
+authors:
+  - family-names: "Pedersen"
+    given-names: "Anders Gorm"
+    orcid: "https://orcid.org/0000-0001-9650-8965" 
+repository-code: "https://github.com/agormp/seqconverter"
+doi: ""
