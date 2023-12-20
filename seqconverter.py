@@ -127,10 +127,11 @@ def build_parser():
     seqpartg.add_argument("--samplecols", action="store", type=int, metavar="N",
                         help="Randomly sample N columns from alignment")
 
-    seqpartg.add_argument("--keepcols", action="store", dest="keepcols", metavar="INDEXLIST",
-                          help="Keep listed columns in alignment. "
-                             + "Columns can be indicated as comma-separated list of indices, and as ranges. "
-                             + "Example: --keepcols 10,15,22-40,57")
+    seqpartg.add_argument("--keepcols",  nargs='+', type=str, metavar="INDEX_OR_RANGE",
+                          help="Keep alignment columns indicated by one or more INDEX_OR_RANGE values. "
+                             + "INDEX_OR_RANGE values are either a single position (e.g., 15) "
+                             + "or a range (e.g., 20-37). Multiple values shold be separated by "
+                             + "blanks. Example: --keepcols 10 15 22-40 57")
 
     seqpartg.add_argument("--remcols", action="store", dest="remcols", metavar="INDEXLIST",
                           help="Remove listed columns from alignment. "
@@ -470,14 +471,13 @@ def check_args_alignment_issues(args):
 
 ################################################################################################
 
-def parse_indexlist(seqs, indexlist_string):
+def parse_indexlist(seqs, indexlist):
     """Parse INDEX-LIST string, create list of all individual positions implied by syntax
     Note: input assumed to be 1-indexed, output is 0-indexed ("slicesyntax")
     Example: input: 1-5,10,15-18, output: [0,1,2,3,4,9,14,15,16,17]"""
 
     poslist = []
-    items = indexlist_string.split(",")
-    for item in items:
+    for item in indexlist:
        if "-" in item:
            (start,stop) = item.split("-")
            start = int(start) - 1       # Slice syntax: Numbering starts at 0
