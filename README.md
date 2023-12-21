@@ -81,7 +81,7 @@ seqconverter -h
 
 ```
 seqconverter --informat fasta --outformat nexus \
-             --width 70 myalignment.fasta > myalignment.nexus
+             --width 70 -i myalignment.fasta > myalignment.nexus
 ```
 
 Note 1: output is written to the terminal so you need to use redirection to store in a file.
@@ -94,7 +94,7 @@ Note 2: input format will be automatically detected if not specified with --info
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --keepreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
+             --keepreg "seq_1[0-9]+" -i myseqs.fasta > subset.fasta
 ```
 Note: default output format is fasta, so you do not need to specify --outformat fasta
 
@@ -104,7 +104,7 @@ Note: default output format is fasta, so you do not need to specify --outformat 
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --remreg "seq_1[0-9]+" myseqs.fasta > subset.fasta
+             --remreg "seq_1[0-9]+" -i myseqs.fasta > subset.fasta
 ```
 
 ----
@@ -113,7 +113,7 @@ seqconverter --informat fasta --outformat fasta \
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --sampleseq 50 myseqs.fasta > subset.fasta
+             --sampleseq 50 -i myseqs.fasta > subset.fasta
 ```
 
 ----
@@ -122,7 +122,7 @@ seqconverter --informat fasta --outformat fasta \
 
 ```
 seqconverter --informat clustal --outformat fasta \
-             --keepvar 484K 501Y myalignment.aln > voc.fasta
+             --keepvar 484K 501Y -i myalignment.aln > voc.fasta
 ```
 
 ----
@@ -131,7 +131,7 @@ seqconverter --informat clustal --outformat fasta \
 
 ```
 seqconverter --informat clustal --outformat fasta \
-             --keepcols 50-150 myalignment.aln > aligment_50_150.fasta
+             --keepcols 50-150 -i myalignment.aln > aligment_50_150.fasta
 ```
 
 ----
@@ -140,7 +140,7 @@ seqconverter --informat clustal --outformat fasta \
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --remgapcols myalignment.fasta > gapfree.fasta
+             --remgapcols -i myalignment.fasta > gapfree.fasta
 ```
 
 ----
@@ -149,7 +149,7 @@ seqconverter --informat fasta --outformat fasta \
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --remgapcols 0.75 myalignment.fasta > fewergaps.fasta
+             --remgapcols 0.75 -i myalignment.fasta > fewergaps.fasta
 ```
 
 ----
@@ -160,7 +160,7 @@ This command will remove alignment columns if more than 75% of sequences have en
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --remendgapcols 0.75 myalignment.fasta > fewer_endgaps.fasta
+             --remendgapcols 0.75 -i myalignment.fasta > fewer_endgaps.fasta
 ```
 
 ----
@@ -173,7 +173,7 @@ When used with the --charset (and possibly --mb) option this can be used to set 
 
 ```
 seqconverter --informat fasta --outformat fasta \
-             --paste gene1.fasta gene2.fasta gene3.fasta > concat.fasta
+             --paste -i gene1.fasta -i gene2.fasta -i gene3.fasta > concat.fasta
 ```
 
 ----
@@ -186,7 +186,7 @@ This can be used for phylogenetic analyses in BEAST or MrBayes where different g
 
 ```
 seqconverter --outformat nexus --paste \
-             --charset gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+             --charset -i gene1.fasta -i gene2.fasta -i gene3.fasta > partitioned.nexus
 ```
 
 ----
@@ -197,7 +197,7 @@ This command does the same as the example above, and additionally adds a MrBayes
 
 ```
 seqconverter --outformat nexus --paste \
-             --charset --mb gene1.fasta gene2.fasta gene3.fasta > partitioned.nexus
+             --charset --mb -i gene1.fasta -i gene2.fasta -i gene3.fasta > partitioned.nexus
 ```
 
 
