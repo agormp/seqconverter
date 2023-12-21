@@ -338,21 +338,21 @@ def check_commandline(args):
     if args.keepcols and args.remconscols:
         raise sq.SeqError("Options --keepcols and --remconscols cannot be used simultaneously")
 
-    # Sanity check #5: option --saverename requires option --renamenum or --renameregex
-    if args.savenamefile and not (args.renamenum or args.renameregex):
-        raise sq.SeqError("Option --saverename requires option --renamenum or --renameregex")
+    # Sanity check #5: option --saverename requires option --renamenum or --renamereg
+    if args.savenamefile and not (args.renamenum or args.renamereg):
+        raise sq.SeqError("Option --saverename requires option --renamenum or --renamereg")
 
     # Sanity check #6: args --renamenum and --renamefile are incompatible
     if args.renamenum and  args.renamefile:
         raise sq.SeqError("Option --renamenum and --renamefile cannot be used simultaneously")
 
-    # Sanity check #7: args --renameregex and --renamefile are incompatible
-    if args.renameregex and  args.renamefile:
-        raise sq.SeqError("Option --renameregex and --renamefile cannot be used simultaneously")
+    # Sanity check #7: args --renamereg and --renamefile are incompatible
+    if args.renamereg and  args.renamefile:
+        raise sq.SeqError("Option --renamereg and --renamefile cannot be used simultaneously")
 
-    # Sanity check #8: args --renameregex and --paste are incompatible
-    if args.renameregex and  args.paste:
-        raise sq.SeqError("Option --renameregex and --paste cannot be used simultaneously: first rename, then paste resulting files")
+    # Sanity check #8: args --renamereg and --paste are incompatible
+    if args.renamereg and  args.paste:
+        raise sq.SeqError("Option --renamereg and --paste cannot be used simultaneously: first rename, then paste resulting files")
 
     # Sanity check #9c: option --overlap is not meaningful unless several input files are provided
     if args.overlap and len(args.filelist) == 1:
@@ -635,8 +635,8 @@ def change_seqs(seqs, args):
         seqs.changeseqname(oldname, newname)
     elif args.renamenum:
         seqs.rename_numbered(args.renamenum, args.savenamefile)
-    elif args.renameregex:
-        old_regex, new_string = args.renameregex
+    elif args.renamereg:
+        old_regex, new_string = args.renamereg
         seqs.rename_regexp(old_regex, new_string, args.savenamefile)
 
     # Restore names
