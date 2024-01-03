@@ -253,7 +253,7 @@ Select subset of sequences:
   --remdupname          Remove sequences with duplicate names (keeping one of each,
                         randomly selected). If this option is not set (default): stop
                         execution on duplicate names.
-  --remendgapseqs MIN   Discard sequences with endgaps >= MIN positions Endgaps are
+  --remendgapseqs MIN   Discard sequences with endgaps >= MIN positions. Endgaps are
                         defined as contiguous block of gap symbols at either end of
                         sequence.
 

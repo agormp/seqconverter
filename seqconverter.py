@@ -121,7 +121,7 @@ def build_parser():
                           help="Remove sequences with duplicate names (keeping one of each, randomly selected). If this option is not set (default): stop execution on duplicate names.")
 
     subsetg.add_argument("--remendgapseqs", action="store", type=int, metavar="MIN",
-                        help="Discard sequences with endgaps >= MIN positions "
+                        help="Discard sequences with endgaps >= MIN positions. "
                             + "Endgaps are defined as contiguous block of gap symbols at either end of sequence.")
 
     #########################################################################################
