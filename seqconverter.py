@@ -166,6 +166,10 @@ def build_parser():
     seqpartg.add_argument("--remconscols", action="store_true", dest="remconscols",
                           help="Remove conserved columns from alignment")
 
+    seqpartg.add_argument("--remhmminsertcols", action="store_true", dest="remhmminsertcols",
+                          help=argparse.SUPPRESS)  # Secret option
+                          # help="When reading Stockholm format file from HMMer's hmmalign: remove columns corresponding to insert states")
+
     seqpartg.add_argument("--windows", action="store", type=int, dest="wsize", metavar="WSIZE",
                           help="For each sequence in input: extract all overlapping sequence windows "
                              + "of size WSIZE")
@@ -620,6 +624,10 @@ def change_seqs(seqs, args):
     # Removal of conserved columns
     if args.remconscols:
         seqs.remconscol()
+
+    # Removal of insert state columns (in output from HMMer's hmmalign)
+    if args.remhmminsertcols:
+        seqs.rem_hmmalign_insertcol()
 
     # Extraction of sequence windows
     if args.wsize:
