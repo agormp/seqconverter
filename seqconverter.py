@@ -24,7 +24,6 @@ from pathlib import Path
 def main():
     parser = build_parser()
     args = parser.parse_args()
-
     try:
         args = check_commandline(args)
         seqs,args = read_seqs(args)
