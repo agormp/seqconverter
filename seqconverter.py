@@ -85,7 +85,9 @@ def build_parser():
                       help="Output format:  %(choices)s [default: %(default)s]")
 
     fileg.add_argument("--width", action="store", type=int, dest="width", metavar="WIDTH", default=60,
-                        help="Print sequences with WIDTH characters per line [default: %(default)s]")
+                        help="Print sequences with WIDTH characters per line [default: %(default)s] " 
+                        + "Use the special value -1 (--width -1) to print each sequence in its "
+                        + "entirety on a single line, regardless of its length.")
 
     #########################################################################################
 
