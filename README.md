@@ -1,6 +1,6 @@
 # seqconverter
 
-![](https://img.shields.io/badge/version-3.2.4-blue)
+![](https://img.shields.io/badge/version-3.2.5-blue)
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=PyPI%20downloads&service=github)](https://pepy.tech/project/seqconverter)
 [![DOI](https://zenodo.org/badge/433106305.svg)](https://zenodo.org/doi/10.5281/zenodo.10411474)
 
