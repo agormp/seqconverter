@@ -21,10 +21,10 @@ from pathlib import Path
 
 ################################################################################################
 
-def main():
+def main():    
     parser = build_parser()
     args = parser.parse_args()
-    try:
+    try:        
         args = check_commandline(args)
         seqs,args = read_seqs(args)
         check_args_alignment_issues(args)
@@ -367,8 +367,7 @@ def check_commandline(args):
 
 ################################################################################################
 
-def read_seqs(args):
-
+def read_seqs(args):    
     for filename in args.filelist:
         if filename != "-" and not os.path.isfile(filename):
             raise sq.SeqError("File %s not found." % filename)
@@ -385,7 +384,7 @@ def read_seqs(args):
         if args.informat == "autodetect" and isinstance(seqfile, sq.Alignfile_reader):
             args.aligned = True
 
-        if args.aligned:
+        if args.aligned:            
             seqlist.append(seqfile.read_alignment(args.dupnamefilter))
         else:
             seqlist.append(seqfile.read_seqs(args.dupnamefilter))
@@ -541,7 +540,10 @@ def change_seqs(seqs, args):
 
     # Extract sequences whose names match regexp in "keepreg"
     if args.keepreg:
-        newseqs = sq.Seq_set()
+        if args.aligned:
+            newseqs = sq.Seq_alignment()            
+        else: 
+            newseqs = sq.Seq_set()
         regexp = args.keepreg
         for seq in seqs:
             if re.search(regexp, seq.name):
@@ -550,7 +552,10 @@ def change_seqs(seqs, args):
 
     # Discard sequences whose names match regexp in "remreg"
     if args.remreg:
-        newseqs = sq.Seq_set()
+        if args.aligned:
+            newseqs = sq.Seq_alignment()            
+        else: 
+            newseqs = sq.Seq_set()
         regexp = args.remreg
         for seq in seqs:
             if not re.search(regexp, seq.name):
@@ -632,7 +637,10 @@ def change_seqs(seqs, args):
 
     # Extraction of sequence windows
     if args.wsize:
-        newseqs = sq.Seq_set()
+        if args.aligned:
+            newseqs = sq.Seq_alignment()            
+        else: 
+            newseqs = sq.Seq_set()
         for seq in seqs:
             for seqwin in seq.windows(args.wsize, rename=True):
                 newseqs.addseq(seqwin)
@@ -651,7 +659,6 @@ def change_seqs(seqs, args):
     # Restore names
     if args.renamefile:
         seqs.transname(args.renamefile)
-
 
     # Translation
     if args.reading_frame:
