@@ -282,7 +282,7 @@ def build_parser():
                       + " mean, std, min, max")
 
     summaryg.add_argument("--divseq", action="store_true", 
-                      help="(For alignments) Print sequence diversity For each pair of sequences: "
+                      help="(For alignments) Print sequence diversity for each pair of sequences: "
                       + " name1, name2, fractional difference")
 
     summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
