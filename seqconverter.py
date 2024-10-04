@@ -278,8 +278,12 @@ def build_parser():
                       help="Print composition for each individual sequence. Output is one line per residue-type per sequence: seqname, residue-type, freq, count, seqlength")
 
     summaryg.add_argument("--div", action="store_true", dest="s_div",
-                      help="(For alignments) Print nucleotide diversity (=average pairwise sequence difference):"
+                      help="(For alignments) Print sequence diversity (=average pairwise sequence difference):"
                       + " mean, std, min, max")
+
+    summaryg.add_argument("--divseq", action="store_true", 
+                      help="(For alignments) Print sequence diversity For each pair of sequences: "
+                      + " name1, name2, fractional difference")
 
     summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
                       help="When computing composition or diversity: do not count gap symbols")
