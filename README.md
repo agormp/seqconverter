@@ -289,7 +289,7 @@ Selecting subset of positions in sequences:
 Renaming sequences:
   --rename OLD NEW      Rename single sequence from OLD to NEW
   --renamenum BASENAME  Rename all sequences to this form: BASENAME_001, ...
-  --renameregex "OLD_REGEX" "NEW_STRING"
+  --renamereg "OLD_REGEX" "NEW_STRING"
                         Rename sequences: Replace occurrences of regular expression
                         OLD_REGEX with NEW_STRING
   --saverename NAMEFILE
@@ -316,26 +316,25 @@ Combining multiple sequence files:
                         covered by a unique set of genes. To see partitions choose nexus
                         output, or output to multiple partition files. MIN: (optional,
                         integer) minimum number of overlapping residues required for
-                        merging input alignments (default: set automatically based on
-                        seq lengths)
+                        merging input alignments (default: set automatically based on seq
+                        lengths)
   --multifile           Outputs to multiple files (one per partition) instead of stdout.
                         Partitions are generated automatically based on other options.
   --charset             Appends Nexus form charset block listing partitions in data
                         (forces output in Nexus format). Charsets and partitions are
                         generated automatically based on other options.
   --mb                  Appends MrBayes block with commands for running partitioned
-                        analysis (forces output in Nexus format). Charsets and
-                        partitions are generated automatically based on other options.
+                        analysis (forces output in Nexus format). Charsets and partitions
+                        are generated automatically based on other options.
 
 DNA manipulations:
   --revcomp             Return reverse complement of sequence(s). Requires sequences to
                         be DNA.
   --translate READING_FRAME
                         Translate input DNA sequences into amino acid sequences.
-                        READING_FRAME: either 1, 2, or 3, where 1 means start
-                        translation from first nucleotide in sequences. Translation
-                        includes as many full-length codons as possible, given
-                        READING_FRAME.
+                        READING_FRAME: either 1, 2, or 3, where 1 means start translation
+                        from first nucleotide in sequences. Translation includes as many
+                        full-length codons as possible, given READING_FRAME.
 
 Summaries:
   No sequences are printed when these options are used
