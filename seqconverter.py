@@ -711,12 +711,20 @@ def print_summary(seqs, args):
         
     if args.divseq:
         diff_df = seqs.pairwise_sequence_distances(ignoregaps=args.s_ignoregaps)
-        max_len_name1 = diff_df['seq1'].str.len().max()
-        max_len_name2 = diff_df['seq2'].str.len().max()
-
+        max1 = diff_df['seq1'].str.len().max()
+        name1len = max(max1, 4)
+        max2 = diff_df['seq2'].str.len().max()
+        name2len = max(max2, 4)
         print("All pairwise sequence distances")
+        name1="Seq1"
+        name2="Seq2"
+        dist="Distance"
+        print(f"    {name1:<{name1len}}  {name2:<{name2len}}  {dist:>8}")
         for index, row in diff_df.iterrows():
-            print(f"    {row['seq1']:<{max_len_name1}}  {row['seq2']:<{max_len_name2}}  {row['distance']:>8.3f}")
+            name1 = row['seq1']
+            name2 = row['seq2']
+            dist = row['distance']
+            print(f"    {name1:<{name1len}}  {name2:<{name2len}}  {dist:>8.4g}")
         print("\n")
             
     if args.s_sit:
