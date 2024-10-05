@@ -210,15 +210,15 @@ usage: seqconverter [-h] [-i SEQFILE] [--informat FORMAT] [--outformat FORMAT]
                     [--keepvar VARIANT [VARIANT ...]] [--remdupseq] [--remdupname]
                     [--remendgapseqs MIN] [--samplecols N]
                     [--keepcols INDEX_OR_RANGE [INDEX_OR_RANGE ...]]
-                    [--remcols INDEX_OR_RANGE [INDEX_OR_RANGE ...]]
-                    [--remgapcols [FRAC]] [--remambigcols [FRAC]]
-                    [--remendgapcols [FRAC]] [--remconscols] [--windows WSIZE] [--degap]
-                    [--rename OLD NEW] [--renamenum BASENAME]
-                    [--renameregex "OLD_REGEX" "NEW_STRING"] [--saverename NAMEFILE]
+                    [--remcols INDEX_OR_RANGE [INDEX_OR_RANGE ...]] [--remgapcols [FRAC]]
+                    [--remambigcols [FRAC]] [--remendgapcols [FRAC]] [--remconscols]
+                    [--windows WSIZE] [--degap] [--rename OLD NEW] [--renamenum BASENAME]
+                    [--renamereg "OLD_REGEX" "NEW_STRING"] [--saverename NAMEFILE]
                     [--renamefile NAMEFILE] [--gbname FIELD1[,FIELD2,FIELD3,...]]
                     [--paste] [--overlap [MIN]] [--multifile] [--charset] [--mb]
                     [--revcomp] [--translate READING_FRAME] [--nam] [--num] [--len]
-                    [--sit] [--com] [--comseq] [--div] [--ignoregaps] [--debug]
+                    [--sit] [--com] [--comseq] [--div] [--divseq] [--ignoregaps]
+                    [--debug]
 
 options:
   -h, --help            show this help message and exit
@@ -232,9 +232,11 @@ Input/Output:
                         genbank, tab, raw, how [default: auto]
   --outformat FORMAT    Output format: fasta, nexus, phylip, clustal, tab, raw, how
                         [default: fasta]
-  --width WIDTH         Print sequences with WIDTH characters per line [default: 60]
+  --width WIDTH         Print sequences with WIDTH characters per line [default: 60] Use
+                        the special value -1 (--width -1) to print each sequence in its
+                        entirety on a single line, regardless of its length.
 
-Select subset of sequences:
+Selecting subset of sequences:
   --sampleseq N         Randomly sample N sequences from sequence set
   --keepreg "REGEXP"    Select sequences where substring of name matches regular
                         expression
@@ -244,10 +246,9 @@ Select subset of sequences:
   --remname NAMEFILE    Discard sequences listed in NAMEFILE
   --keepvar VARIANT [VARIANT ...]
                         Select sequences containing specific variants, i.e., specific
-                        residues on specific positions. Syntax for specifying VARIANT
-                        is: <POS><RESIDUE> (e.g., 484K). Multiple variants can be
-                        specifyed simultaneously separated by blanks. Example: --keepvar
-                        484K 501Y
+                        residues on specific positions. Syntax for specifying VARIANT is:
+                        <POS><RESIDUE> (e.g., 484K). Multiple variants can be specifyed
+                        simultaneously separated by blanks. Example: --keepvar 484K 501Y
   --remdupseq           Remove duplicate sequences (keeping one of each, randomly
                         selected).
   --remdupname          Remove sequences with duplicate names (keeping one of each,
@@ -257,18 +258,18 @@ Select subset of sequences:
                         defined as contiguous block of gap symbols at either end of
                         sequence.
 
-Select subset of positions in sequences:
+Selecting subset of positions in sequences:
   --samplecols N        Randomly sample N columns from alignment
   --keepcols INDEX_OR_RANGE [INDEX_OR_RANGE ...]
                         Keep alignment columns indicated by one or more INDEX_OR_RANGE
-                        values. INDEX_OR_RANGE values are either a single position
-                        (e.g., 15) or a range (e.g., 20-37). Multiple values shold be
-                        separated by blanks. Example: --keepcols 10 15 22-40 57
+                        values. INDEX_OR_RANGE values are either a single position (e.g.,
+                        15) or a range (e.g., 20-37). Multiple values shold be separated
+                        by blanks. Example: --keepcols 10 15 22-40 57
   --remcols INDEX_OR_RANGE [INDEX_OR_RANGE ...]
                         Remove alignment columns indicated by one or more INDEX_OR_RANGE
-                        values. INDEX_OR_RANGE values are either a single position
-                        (e.g., 15) or a range (e.g., 20-37). Multiple values shold be
-                        separated by blanks. Example: --remcols 10 15 22-40 57
+                        values. INDEX_OR_RANGE values are either a single position (e.g.,
+                        15) or a range (e.g., 20-37). Multiple values shold be separated
+                        by blanks. Example: --remcols 10 15 22-40 57
   --remgapcols [FRAC]   Remove columns that contain any gaps. If FRAC (number between
                         0-1) given: Remove columns where the fraction of gaps >= FRAC.
   --remambigcols [FRAC]
