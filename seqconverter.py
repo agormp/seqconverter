@@ -17,6 +17,7 @@ import os.path
 import sequencelib as sq
 import argparse
 import re
+import pandas as pd
 from pathlib import Path
 
 ################################################################################################
@@ -40,7 +41,7 @@ def main():
         if args.multifile:
             write_partitions(seqs, args)
         else:
-            if any([args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_comseq, args.s_sit]):
+            if any([args.s_nam, args.s_len, args.s_num, args.s_div, args.s_com, args.s_comseq, args.s_sit, args.divseq]):
                 print_summary(seqs, args)
             else:
                 print_seqs(seqs, args)
@@ -702,12 +703,22 @@ def print_summary(seqs, args):
 
     if args.s_div:
         avg, std, minpi, maxpi = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
-        print("Nucleotide diversity pi (average pairwise sequence distance)")
+        print("Sequence diversity (average pairwise sequence distance)")
         print(f"    Mean:               {avg:.5f}")
         print(f"    Standard dev:       {std:.5f}")
         print(f"    Min:                {minpi:.5f}")
         print(f"    Max:                {maxpi:.5f}\n")
+        
+    if args.divseq:
+        diff_df = seqs.pairwise_sequence_distances(ignoregaps=args.s_ignoregaps)
+        max_len_name1 = diff_df['seq1'].str.len().max()
+        max_len_name2 = diff_df['seq2'].str.len().max()
 
+        print("All pairwise sequence distances")
+        for index, row in diff_df.iterrows():
+            print(f"    {row['seq1']:<{max_len_name1}}  {row['seq2']:<{max_len_name2}}  {row['distance']:>8.3f}")
+        print("\n")
+            
     if args.s_sit:
         numvar = 0
         nummulti = 0
