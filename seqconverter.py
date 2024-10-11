@@ -276,7 +276,8 @@ def build_parser():
                       help="Print overall sequence composition")
 
     summaryg.add_argument("--comseq", action="store_true", dest="s_comseq",
-                      help="Print composition for each individual sequence. Output is one line per residue-type per sequence: seqname, residue-type, freq, count, seqlength")
+                      help="Print composition for each individual sequence. "
+                          + "Output is one line per residue-type per sequence: seqname, residue-type, freq, count, seqlength")
 
     summaryg.add_argument("--div", action="store_true", dest="s_div",
                       help="(For alignments) Print sequence diversity (=average pairwise sequence difference):"
@@ -288,6 +289,9 @@ def build_parser():
 
     summaryg.add_argument("--ignoregaps", action="store_true", dest="s_ignoregaps",
                       help="When computing composition or diversity: do not count gap symbols")
+
+    summaryg.add_argument("--ignoreambig", action="store_true", dest="s_ignoreambig",
+                      help="When computing composition or diversity: do not count IUPAC ambiguity symbols")
 
     #########################################################################################
 
