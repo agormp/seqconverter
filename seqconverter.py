@@ -706,7 +706,8 @@ def print_summary(seqs, args):
             print("Alignment length:    {:10d}\n".format( seqs.alignlen() ))
 
     if args.s_div:
-        avg, std, minpi, maxpi = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps)
+        avg, std, minpi, maxpi = seqs.sequence_diversity(ignoregaps=args.s_ignoregaps, 
+                                                         ignoreambig = args.s_ignoreambig)
         print("Sequence diversity (average pairwise sequence distance)")
         print(f"    Mean:               {avg:.5f}")
         print(f"    Standard dev:       {std:.5f}")
@@ -714,7 +715,8 @@ def print_summary(seqs, args):
         print(f"    Max:                {maxpi:.5f}\n")
         
     if args.divseq:
-        diff_df = seqs.pairwise_sequence_distances(ignoregaps=args.s_ignoregaps)
+        diff_df = seqs.pairwise_sequence_distances(ignoregaps=args.s_ignoregaps, 
+                                                   ignoreambig = args.s_ignoreambig)
         max1 = diff_df['seq1'].str.len().max()
         name1len = max(max1, 4)
         max2 = diff_df['seq2'].str.len().max()
@@ -788,7 +790,8 @@ def print_summary(seqs, args):
         print(f"    Number of unique site patterns:      {len(sitepatterns):>6,d}\n")
 
     if args.s_com:
-        compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps)
+        compositiondict = seqs.composition(ignoregaps=args.s_ignoregaps, 
+                                           ignoreambig = args.s_ignoreambig)
 
         print("Composition:")
         print("    {:^7s}{:>8s}{:>10s}".format("Symbol", "Freq", "Count"))
@@ -817,7 +820,8 @@ def print_summary(seqs, args):
         for seq in seqs:
             length = len(seq)
             name = seq.name
-            compositiondict = seq.composition(ignoregaps=args.s_ignoregaps)
+            compositiondict = seq.composition(ignoregaps=args.s_ignoregaps, 
+                                              ignoreambig = args.s_ignoreambig)
             nonambig = set(compositiondict.keys()) - seq.ambigsymbols - set("-")
             ambig = set(compositiondict.keys()) - nonambig
             nonambig_sorted = sorted(list(nonambig))
