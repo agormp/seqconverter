@@ -12,12 +12,10 @@
 ##########################################################################################
 
 import sys
-import math
 import os.path
 import sequencelib as sq
 import argparse
 import re
-import pandas as pd
 from pathlib import Path
 
 ################################################################################################
