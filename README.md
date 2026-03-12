@@ -1,6 +1,6 @@
 # seqconverter
 
-[![PyPI version](https://img.shields.io/pypi/v/seqconverter)](#installation)
+[![PyPI version](https://img.shields.io/pypi/v/seqconverter?cacheBust=1)](#installation)
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/seqconverter?period=total&units=none&left_color=black&right_color=blue&left_text=PyPI%20downloads&service=github)](https://pepy.tech/project/seqconverter)
 [![DOI](https://zenodo.org/badge/433106305.svg)](https://zenodo.org/doi/10.5281/zenodo.10411474)
 
@@ -118,7 +118,7 @@ seqconverter --informat fasta --outformat fasta \
 
 ----
 
-### Select all sequence variants containing a Lysine at position 484 and a Tyrosine at position 501 
+### Select all sequence variants containing a Lysine at position 484 and a Tyrosine at position 501
 
 ```
 seqconverter --informat clustal --outformat fasta \
